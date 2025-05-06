@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe\protocol;
 
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+use pocketmine\network\mcpe\protocol\types\camera\CameraAimAssistCategories;
 use pocketmine\network\mcpe\protocol\types\camera\CameraAimAssistCategory;
 use pocketmine\network\mcpe\protocol\types\camera\CameraAimAssistPreset;
 use function count;
@@ -56,7 +57,14 @@ class CameraAimAssistPresetsPacket extends DataPacket implements ClientboundPack
 	protected function decodePayload(PacketSerializer $in) : void{
 		$this->categories = [];
 		for($i = 0, $count = $in->getUnsignedVarInt(); $i < $count; ++$i){
-			$this->categories[] = CameraAimAssistCategory::read($in);
+			if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_80){
+				$this->categories[] = CameraAimAssistCategory::read($in);
+			}else{
+				$categories = CameraAimAssistCategories::read($in);
+				foreach($categories->getCategories() as $category){
+					$this->categories[] = $category;
+				}
+			}
 		}
 
 		$this->presets = [];
@@ -72,7 +80,12 @@ class CameraAimAssistPresetsPacket extends DataPacket implements ClientboundPack
 	protected function encodePayload(PacketSerializer $out) : void{
 		$out->putUnsignedVarInt(count($this->categories));
 		foreach($this->categories as $category){
-			$category->write($out);
+			if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_80){
+				$category->write($out);
+			}else{
+				$categories = new CameraAimAssistCategories($category->getName(), [$category]);
+				$categories->write($out);
+			}
 		}
 
 		$out->putUnsignedVarInt(count($this->presets));
