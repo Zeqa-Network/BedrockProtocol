@@ -71,6 +71,9 @@ final class ClientData{
 	public int $GraphicsMode;
 
 	/** @required */
+	public int $GraphicsMode;
+
+	/** @required */
 	public int $GuiScale;
 
 	/** @required */

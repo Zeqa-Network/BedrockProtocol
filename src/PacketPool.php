@@ -245,6 +245,8 @@ class PacketPool{
 		$this->registerPacket(new UpdateClientOptionsPacket());
 		$this->registerPacket(new PlayerVideoCapturePacket());
 		$this->registerPacket(new PlayerUpdateEntityOverridesPacket());
+		$this->registerPacket(new PlayerLocationPacket());
+		$this->registerPacket(new ClientboundControlSchemeSetPacket());
 	}
 
 	public function registerPacket(Packet $packet) : void{

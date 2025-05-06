@@ -869,4 +869,12 @@ trait PacketHandlerDefaultImplTrait{
 	public function handlePlayerUpdateEntityOverridesPacket(PlayerUpdateEntityOverridesPacket $packet) : bool{
 		return false;
 	}
+
+	public function handlePlayerLocation(PlayerLocationPacket $packet) : bool{
+		return false;
+	}
+
+	public function handleClientboundControlSchemeSet(ClientboundControlSchemeSetPacket $packet) : bool{
+		return false;
+	}
 }

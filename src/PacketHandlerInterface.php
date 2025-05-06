@@ -441,4 +441,8 @@ interface PacketHandlerInterface{
 	public function handlePlayerVideoCapturePacket(PlayerVideoCapturePacket $packet) : bool;
 
 	public function handlePlayerUpdateEntityOverridesPacket(PlayerUpdateEntityOverridesPacket $packet) : bool;
+
+	public function handlePlayerLocation(PlayerLocationPacket $packet) : bool;
+
+	public function handleClientboundControlSchemeSet(ClientboundControlSchemeSetPacket $packet) : bool;
 }
