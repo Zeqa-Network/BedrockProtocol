@@ -52,6 +52,7 @@ class PacketPool{
 		$this->registerPacket(new TakeItemActorPacket());
 		$this->registerPacket(new MoveActorAbsolutePacket());
 		$this->registerPacket(new MovePlayerPacket());
+		$this->registerPacket(new PassengerJumpPacket());
 		$this->registerPacket(new UpdateBlockPacket());
 		$this->registerPacket(new AddPaintingPacket());
 		$this->registerPacket(new TickSyncPacket());
@@ -86,6 +87,7 @@ class PacketPool{
 		$this->registerPacket(new CraftingEventPacket());
 		$this->registerPacket(new GuiDataPickItemPacket());
 		$this->registerPacket(new BlockActorDataPacket());
+		$this->registerPacket(new PlayerInputPacket());
 		$this->registerPacket(new LevelChunkPacket());
 		$this->registerPacket(new SetCommandsEnabledPacket());
 		$this->registerPacket(new SetDifficultyPacket());
@@ -219,6 +221,7 @@ class PacketPool{
 		$this->registerPacket(new CameraPresetsPacket());
 		$this->registerPacket(new UnlockedRecipesPacket());
 		$this->registerPacket(new CameraInstructionPacket());
+		$this->registerPacket(new CompressedBiomeDefinitionListPacket());
 		$this->registerPacket(new TrimDataPacket());
 		$this->registerPacket(new OpenSignPacket());
 		$this->registerPacket(new AgentAnimationPacket());

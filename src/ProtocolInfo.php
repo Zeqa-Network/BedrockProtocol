@@ -95,7 +95,7 @@ final class ProtocolInfo{
 	public const TAKE_ITEM_ACTOR_PACKET = 0x11;
 	public const MOVE_ACTOR_ABSOLUTE_PACKET = 0x12;
 	public const MOVE_PLAYER_PACKET = 0x13;
-
+	public const PASSENGER_JUMP_PACKET = 0x14;
 	public const UPDATE_BLOCK_PACKET = 0x15;
 	public const ADD_PAINTING_PACKET = 0x16;
 	public const TICK_SYNC_PACKET = 0x17;
@@ -132,7 +132,7 @@ final class ProtocolInfo{
 	public const GUI_DATA_PICK_ITEM_PACKET = 0x36;
 	public const ADVENTURE_SETTINGS_PACKET = 0x37;
 	public const BLOCK_ACTOR_DATA_PACKET = 0x38;
-
+	public const PLAYER_INPUT_PACKET = 0x39;
 	public const LEVEL_CHUNK_PACKET = 0x3a;
 	public const SET_COMMANDS_ENABLED_PACKET = 0x3b;
 	public const SET_DIFFICULTY_PACKET = 0x3c;
@@ -274,7 +274,7 @@ final class ProtocolInfo{
 	public const UNLOCKED_RECIPES_PACKET = 0xc7;
 
 	public const CAMERA_INSTRUCTION_PACKET = 0x12c;
-
+	public const COMPRESSED_BIOME_DEFINITION_LIST_PACKET = 0x12d;
 	public const TRIM_DATA_PACKET = 0x12e;
 	public const OPEN_SIGN_PACKET = 0x12f;
 	public const AGENT_ANIMATION_PACKET = 0x130;

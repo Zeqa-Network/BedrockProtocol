@@ -56,6 +56,8 @@ interface PacketHandlerInterface{
 
 	public function handleMovePlayer(MovePlayerPacket $packet) : bool;
 
+	public function handlePassengerJump(PassengerJumpPacket $packet) : bool;
+
 	public function handleUpdateBlock(UpdateBlockPacket $packet) : bool;
 
 	public function handleAddPainting(AddPaintingPacket $packet) : bool;
@@ -123,6 +125,8 @@ interface PacketHandlerInterface{
 	public function handleGuiDataPickItem(GuiDataPickItemPacket $packet) : bool;
 
 	public function handleBlockActorData(BlockActorDataPacket $packet) : bool;
+
+	public function handlePlayerInput(PlayerInputPacket $packet) : bool;
 
 	public function handleLevelChunk(LevelChunkPacket $packet) : bool;
 
@@ -389,6 +393,8 @@ interface PacketHandlerInterface{
 	public function handleUnlockedRecipes(UnlockedRecipesPacket $packet) : bool;
 
 	public function handleCameraInstruction(CameraInstructionPacket $packet) : bool;
+
+	public function handleCompressedBiomeDefinitionList(CompressedBiomeDefinitionListPacket $packet) : bool;
 
 	public function handleTrimData(TrimDataPacket $packet) : bool;
 

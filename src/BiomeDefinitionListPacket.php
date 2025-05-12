@@ -42,9 +42,9 @@ class BiomeDefinitionListPacket extends DataPacket implements ClientboundPacket{
 	/**
 	 * @generate-create-func
 	 * @param BiomeDefinitionData[] $definitionData
-	 * @param string[] 				$strings
-	 * @phpstan-var list<BiomeDefinitionData> 	$definitionData
-	 * @phpstan-param list<string>            	$strings
+	 * @param string[]              $strings
+	 * @phpstan-param list<BiomeDefinitionData> $definitionData
+	 * @phpstan-param list<string>              $strings
 	 * @phpstan-param CacheableNbt<CompoundTag> $legacyDefinitions
 	 */
 	private static function internalCreate(?array $definitionData, ?array $strings, ?CacheableNbt $legacyDefinitions) : self{
@@ -58,7 +58,7 @@ class BiomeDefinitionListPacket extends DataPacket implements ClientboundPacket{
 	/**
 	 * @param BiomeDefinitionData[] $definitionData
 	 * @param string[] 				$strings
-	 * @phpstan-var list<BiomeDefinitionData> 	$definitionData
+	 * @phpstan-param list<BiomeDefinitionData> $definitionData
 	 * @phpstan-param list<string>            	$strings
 	 */
 	public static function create(array $definitionData, array $strings) : self{
@@ -71,7 +71,6 @@ class BiomeDefinitionListPacket extends DataPacket implements ClientboundPacket{
 	public static function createLegacy(CacheableNbt $definitions) : self{
 		return self::internalCreate(null, null, $definitions);
 	}
-
 
 	/**
 	 * @phpstan-param list<BiomeDefinitionEntry> $definitions
@@ -144,7 +143,7 @@ class BiomeDefinitionListPacket extends DataPacket implements ClientboundPacket{
 			$data->hasRain(),
 			($tagIndexes = $data->getTagIndexes()) === null ? null : array_map($this->locateString(...), $tagIndexes),
 			$data->getChunkGenData(),
-		), $this->definitionData);
+		), $this->definitionData ?? throw new PacketDecodeException("No definition data available"));
 	}
 
 	protected function decodePayload(PacketSerializer $in) : void{
