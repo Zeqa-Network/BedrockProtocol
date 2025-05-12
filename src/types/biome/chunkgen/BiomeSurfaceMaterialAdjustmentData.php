@@ -12,39 +12,39 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\network\mcpe\protocol\types\biome;
+namespace pocketmine\network\mcpe\protocol\types\biome\chunkgen;
 
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 use function count;
 
-final class BiomeTagsData{
+final class BiomeSurfaceMaterialAdjustmentData{
 
 	/**
-	 * @param int[] $indexes
+	 * @param BiomeElementData[] $adjustments
 	 */
 	public function __construct(
-		private array $indexes,
+		private array $adjustments,
 	){}
 
 	/**
-	 * @return int[]
+	 * @return BiomeElementData[]
 	 */
-	public function getIndexes() : array{ return $this->indexes; }
+	public function getAdjustments() : array{ return $this->adjustments; }
 
 	public static function read(PacketSerializer $in) : self{
-		$tags = [];
+		$adjustments = [];
 
 		for($i = 0, $count = $in->getUnsignedVarInt(); $i < $count; ++$i){
-			$tags[] = $in->getLShort();
+			$adjustments[] = BiomeElementData::read($in);
 		}
 
-		return new self($tags);
+		return new self($adjustments);
 	}
 
 	public function write(PacketSerializer $out) : void{
-		$out->putUnsignedVarInt(count($this->indexes));
-		foreach($this->indexes as $tag){
-			$out->putLShort($tag);
+		$out->putUnsignedVarInt(count($this->adjustments));
+		foreach($this->adjustments as $adjustment){
+			$adjustment->write($out);
 		}
 	}
 }
