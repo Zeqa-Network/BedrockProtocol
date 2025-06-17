@@ -842,10 +842,6 @@ trait PacketHandlerDefaultImplTrait{
 		return false;
 	}
 
-	public function handleSetMovementAuthority(SetMovementAuthorityPacket $packet) : bool{
-		return false;
-	}
-
 	public function handleCameraAimAssistPresets(CameraAimAssistPresetsPacket $packet) : bool{
 		return false;
 	}
@@ -875,6 +871,10 @@ trait PacketHandlerDefaultImplTrait{
 	}
 
 	public function handleClientboundControlSchemeSet(ClientboundControlSchemeSetPacket $packet) : bool{
+		return false;
+	}
+
+	public function handleServerScriptDebugDrawer(ServerScriptDebugDrawerPacket $packet) : bool{
 		return false;
 	}
 }
