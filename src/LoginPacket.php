@@ -49,37 +49,52 @@ class LoginPacket extends DataPacket implements ServerboundPacket{
 
 	protected function decodePayload(PacketSerializer $in) : void{
 		$this->protocol = $in->getInt();
-		$this->decodeConnectionRequest($in->getString());
+		$this->decodeConnectionRequest($in->getString(), $in->getProtocolId());
 	}
 
-	protected function decodeConnectionRequest(string $binary) : void{
+	protected function decodeConnectionRequest(string $binary, int $protocolId) : void{
 		$connRequestReader = new BinaryStream($binary);
 
-		$authInfoJsonLength = $connRequestReader->getLInt();
-		if($authInfoJsonLength <= 0){
-			//technically this is always positive; the problem results because getLInt() is implicitly signed
-			//this is inconsistent with many other methods, but we can't do anything about that for now
-			throw new PacketDecodeException("Length of chain data JSON must be positive");
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_90){
+			$authInfoJsonLength = $connRequestReader->getLInt();
+			if($authInfoJsonLength <= 0){
+				//technically this is always positive; the problem results because getLInt() is implicitly signed
+				//this is inconsistent with many other methods, but we can't do anything about that for now
+				throw new PacketDecodeException("Length of chain data JSON must be positive");
+			}
+			try{
+				$authInfoJson = json_decode($connRequestReader->get($authInfoJsonLength), associative: true, flags: JSON_THROW_ON_ERROR);
+			}catch(\JsonException $e){
+				throw new PacketDecodeException("Failed decoding auth info JSON: " . $e->getMessage());
+			}
+			if(!is_array($authInfoJson) || count($authInfoJson) !== 3 || !isset($authInfoJson["Certificate"]) || !is_string($authInfoJson["Certificate"])){
+				throw new PacketDecodeException("Chain data must be a JSON object containing a 'Certificate' element");
+			}
+			if(!isset($authInfoJson["AuthenticationType"])){
+				throw new PacketDecodeException("Chain data must be a JSON object with 'AuthenticationType'");
+			}
+			if($authInfoJson["AuthenticationType"] === 1){
+				throw new PacketDecodeException("Guest authentication is not supported by this server");
+			}
+			try{
+				$chainDataJson = json_decode($authInfoJson["Certificate"], associative: true, flags: JSON_THROW_ON_ERROR);
+			}catch(\JsonException $e){
+				throw new PacketDecodeException("Failed decoding chain data JSON: " . $e->getMessage());
+			}
+		}else{
+			$chainDataJsonLength = $connRequestReader->getLInt();
+			if($chainDataJsonLength <= 0){
+				//technically this is always positive; the problem results because getLInt() is implicitly signed
+				//this is inconsistent with many other methods, but we can't do anything about that for now
+				throw new PacketDecodeException("Length of chain data JSON must be positive");
+			}
+			try{
+				$chainDataJson = json_decode($connRequestReader->get($chainDataJsonLength), associative: true, flags: JSON_THROW_ON_ERROR);
+			}catch(\JsonException $e){
+				throw new PacketDecodeException("Failed decoding chain data JSON: " . $e->getMessage());
+			}
 		}
-		try{
-			$authInfoJson = json_decode($connRequestReader->get($authInfoJsonLength), associative: true, flags: JSON_THROW_ON_ERROR);
-		}catch(\JsonException $e){
-			throw new PacketDecodeException("Failed decoding auth info JSON: " . $e->getMessage());
-		}
-		if(!is_array($authInfoJson) || count($authInfoJson) !== 3 || !isset($authInfoJson["Certificate"]) || !is_string($authInfoJson["Certificate"])){
-			throw new PacketDecodeException("Chain data must be a JSON object containing a 'Certificate' element");
-		}
-		if(!isset($authInfoJson["AuthenticationType"])){
-			throw new PacketDecodeException("Chain data must be a JSON object with 'AuthenticationType'");
-		}
-		if($authInfoJson["AuthenticationType"] === 1){
-			throw new PacketDecodeException("Guest authentication is not supported by this server");
-		}
-		try{
-			$chainDataJson = json_decode($authInfoJson["Certificate"], associative: true, flags: JSON_THROW_ON_ERROR);
-		}catch(\JsonException $e){
-			throw new PacketDecodeException("Failed decoding chain data JSON: " . $e->getMessage());
-		}
+
 		if(!is_array($chainDataJson) || count($chainDataJson) !== 1 || !isset($chainDataJson["chain"])){
 			throw new PacketDecodeException("Chain data must be a JSON object containing only the 'chain' element");
 		}

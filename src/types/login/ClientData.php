@@ -155,6 +155,9 @@ final class ClientData{
 	/** @required */
 	public string $ThirdPartyName;
 
+	/** <= ProtocolInfo::PROTOCOL_1_21_80 */
+	public bool $ThirdPartyNameOnly;
+
 	/** @required */
 	public bool $TrustedSkin;
 

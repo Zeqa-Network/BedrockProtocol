@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe\protocol\types;
 
 use pocketmine\network\mcpe\protocol\PacketDecodeException;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 
 final class SubChunkPacketEntryCommon{
@@ -53,22 +54,24 @@ final class SubChunkPacketEntryCommon{
 			default => throw new PacketDecodeException("Unknown heightmap data type $heightMapDataType")
 		};
 
-		$renderHeightMapDataType = $in->getByte();
-		$renderHeightMapData = match ($renderHeightMapDataType) {
-			SubChunkPacketHeightMapType::NO_DATA => null,
-			SubChunkPacketHeightMapType::DATA => SubChunkPacketHeightMapInfo::read($in),
-			SubChunkPacketHeightMapType::ALL_TOO_HIGH => SubChunkPacketHeightMapInfo::allTooHigh(),
-			SubChunkPacketHeightMapType::ALL_TOO_LOW => SubChunkPacketHeightMapInfo::allTooLow(),
-			SubChunkPacketHeightMapType::ALL_COPIED => $heightMapData,
-			default => throw new PacketDecodeException("Unknown render heightmap data type $renderHeightMapDataType")
-		};
+		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_90){
+			$renderHeightMapDataType = $in->getByte();
+			$renderHeightMapData = match ($renderHeightMapDataType) {
+				SubChunkPacketHeightMapType::NO_DATA => null,
+				SubChunkPacketHeightMapType::DATA => SubChunkPacketHeightMapInfo::read($in),
+				SubChunkPacketHeightMapType::ALL_TOO_HIGH => SubChunkPacketHeightMapInfo::allTooHigh(),
+				SubChunkPacketHeightMapType::ALL_TOO_LOW => SubChunkPacketHeightMapInfo::allTooLow(),
+				SubChunkPacketHeightMapType::ALL_COPIED => $heightMapData,
+				default => throw new PacketDecodeException("Unknown render heightmap data type $renderHeightMapDataType")
+			};
+		}
 
 		return new self(
 			$offset,
 			$requestResult,
 			$data,
 			$heightMapData,
-			$renderHeightMapData
+			$renderHeightMapData ?? null,
 		);
 	}
 
@@ -93,16 +96,18 @@ final class SubChunkPacketEntryCommon{
 			$heightMapData->write($out);
 		}
 
-		if($this->renderHeightMap === null){
-			$out->putByte(SubChunkPacketHeightMapType::ALL_COPIED);
-		}elseif($this->renderHeightMap->isAllTooLow()){
-			$out->putByte(SubChunkPacketHeightMapType::ALL_TOO_LOW);
-		}elseif($this->renderHeightMap->isAllTooHigh()){
-			$out->putByte(SubChunkPacketHeightMapType::ALL_TOO_HIGH);
-		}else{
-			$renderHeightMapData = $this->renderHeightMap; //avoid PHPStan purity issue
-			$out->putByte(SubChunkPacketHeightMapType::DATA);
-			$renderHeightMapData->write($out);
+		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_90){
+			if($this->renderHeightMap === null){
+				$out->putByte(SubChunkPacketHeightMapType::ALL_COPIED);
+			}elseif($this->renderHeightMap->isAllTooLow()){
+				$out->putByte(SubChunkPacketHeightMapType::ALL_TOO_LOW);
+			}elseif($this->renderHeightMap->isAllTooHigh()){
+				$out->putByte(SubChunkPacketHeightMapType::ALL_TOO_HIGH);
+			}else{
+				$renderHeightMapData = $this->renderHeightMap; //avoid PHPStan purity issue
+				$out->putByte(SubChunkPacketHeightMapType::DATA);
+				$renderHeightMapData->write($out);
+			}
 		}
 	}
 }
