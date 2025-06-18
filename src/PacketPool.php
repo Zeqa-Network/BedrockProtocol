@@ -238,6 +238,7 @@ class PacketPool{
 		$this->registerPacket(new CameraAimAssistPacket());
 		$this->registerPacket(new ContainerRegistryCleanupPacket());
 		$this->registerPacket(new MovementEffectPacket());
+		$this->registerPacket(new SetMovementAuthorityPacket());
 		$this->registerPacket(new CameraAimAssistPresetsPacket());
 		$this->registerPacket(new ClientCameraAimAssistPacket());
 		$this->registerPacket(new ClientMovementPredictionSyncPacket());
