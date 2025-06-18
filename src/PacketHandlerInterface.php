@@ -428,8 +428,6 @@ interface PacketHandlerInterface{
 
 	public function handleMovementEffect(MovementEffectPacket $packet) : bool;
 
-	public function handleSetMovementAuthority(SetMovementAuthorityPacket $packet) : bool;
-
 	public function handleCameraAimAssistPresets(CameraAimAssistPresetsPacket $packet) : bool;
 
 	public function handleClientCameraAimAssist(ClientCameraAimAssistPacket $packet) : bool;
