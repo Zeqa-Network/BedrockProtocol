@@ -42,10 +42,10 @@ class LoginPacket extends DataPacket implements ServerboundPacket{
 
 	protected function decodePayload(PacketSerializer $in) : void{
 		$this->protocol = $in->getInt();
-		$this->decodeConnectionRequest($in->getString(), $in->getProtocolId());
+		$this->decodeConnectionRequest($in->getString());
 	}
 
-	protected function decodeConnectionRequest(string $binary, int $protocolId) : void{
+	protected function decodeConnectionRequest(string $binary) : void{
 		$connRequestReader = new BinaryStream($binary);
 
 		$authInfoJsonLength = $connRequestReader->getLInt();
