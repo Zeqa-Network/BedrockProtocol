@@ -29,20 +29,20 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 	private bool $onGround;
 	private int $tick;
 	private int $predictionType;
-	private ?Vector2 $vehicleRotation;
-	private ?float $vehicleAngularVelocity;
+	private Vector2 $vehicleRotation;
+	private float $vehicleAngularVelocity;
 
 	/**
 	 * @generate-create-func
 	 */
-	private static function internalCreate(
+	public static function create(
 		Vector3 $position,
 		Vector3 $delta,
 		bool $onGround,
 		int $tick,
 		int $predictionType,
-		?Vector2 $vehicleRotation,
-		?float $vehicleAngularVelocity,
+		Vector2 $vehicleRotation,
+		float $vehicleAngularVelocity,
 	) : self{
 		$result = new self;
 		$result->position = $position;
@@ -55,14 +55,6 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		return $result;
 	}
 
-	public static function create(Vector3 $position, Vector3 $delta, bool $onGround, int $tick, int $predictionType, ?Vector2 $vehicleRotation, ?float $vehicleAngularVelocity) : self{
-		if($predictionType === self::PREDICTION_TYPE_VEHICLE && $vehicleRotation === null){
-			throw new \LogicException("CorrectPlayerMovePredictionPackets with type VEHICLE require a vehicleRotation to be provided");
-		}
-
-		return self::internalCreate($position, $delta, $onGround, $tick, $predictionType, $vehicleRotation, $vehicleAngularVelocity);
-	}
-
 	public function getPosition() : Vector3{ return $this->position; }
 
 	public function getDelta() : Vector3{ return $this->delta; }
@@ -73,9 +65,9 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 
 	public function getPredictionType() : int{ return $this->predictionType; }
 
-	public function getVehicleRotation() : ?Vector2{ return $this->vehicleRotation; }
+	public function getVehicleRotation() : Vector2{ return $this->vehicleRotation; }
 
-	public function getVehicleAngularVelocity() : ?float{ return $this->vehicleAngularVelocity; }
+	public function getVehicleAngularVelocity() : float{ return $this->vehicleAngularVelocity; }
 
 	protected function decodePayload(PacketSerializer $in) : void{
 		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80){
@@ -83,10 +75,12 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		}
 		$this->position = $in->getVector3();
 		$this->delta = $in->getVector3();
-		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80 && $this->predictionType === self::PREDICTION_TYPE_VEHICLE){
+		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80 && ($this->predictionType === self::PREDICTION_TYPE_VEHICLE || $in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100)){
 			$this->vehicleRotation = new Vector2($in->getFloat(), $in->getFloat());
-			if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-				$this->vehicleAngularVelocity = $in->readOptional($in->getFloat(...));
+			if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
+				$this->vehicleAngularVelocity = $in->getFloat();
+			}elseif($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
+				$this->vehicleAngularVelocity = $in->readOptional($in->getFloat(...)) ?? 0.0;
 			}
 		}
 		$this->onGround = $in->getBool();
@@ -102,15 +96,13 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		}
 		$out->putVector3($this->position);
 		$out->putVector3($this->delta);
-		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80 && $this->predictionType === self::PREDICTION_TYPE_VEHICLE){
-			if($this->vehicleRotation === null){ // this should never be the case
-				throw new \LogicException("CorrectPlayerMovePredictionPackets with type VEHICLE require a vehicleRotation to be provided");
-			}
-
+		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80 && ($this->predictionType === self::PREDICTION_TYPE_VEHICLE || $out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100)){
 			$out->putFloat($this->vehicleRotation->getX());
 			$out->putFloat($this->vehicleRotation->getY());
 
-			if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
+			if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
+				$out->putFloat($this->vehicleAngularVelocity);
+			}elseif($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
 				$out->writeOptional($this->vehicleAngularVelocity, $out->putFloat(...));
 			}
 		}
