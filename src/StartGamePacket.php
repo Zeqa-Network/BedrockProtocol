@@ -191,7 +191,9 @@ class StartGamePacket extends DataPacket implements ClientboundPacket{
 		$this->worldTemplateId = $in->getUUID();
 		$this->enableClientSideChunkGeneration = $in->getBool();
 		$this->blockNetworkIdsAreHashes = $in->getBool();
-		$this->enableTickDeathSystems = $in->getBool();
+		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
+			$this->enableTickDeathSystems = $in->getBool();
+		}
 		$this->networkPermissions = NetworkPermissions::decode($in);
 	}
 
@@ -239,7 +241,9 @@ class StartGamePacket extends DataPacket implements ClientboundPacket{
 		$out->putUUID($this->worldTemplateId);
 		$out->putBool($this->enableClientSideChunkGeneration);
 		$out->putBool($this->blockNetworkIdsAreHashes);
-		$out->putBool($this->enableTickDeathSystems);
+		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
+			$out->putBool($this->enableTickDeathSystems);
+		}
 		$this->networkPermissions->encode($out);
 	}
 

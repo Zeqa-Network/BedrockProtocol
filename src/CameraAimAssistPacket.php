@@ -63,7 +63,9 @@ class CameraAimAssistPacket extends DataPacket implements ClientboundPacket{
 		$this->distance = $in->getLFloat();
 		$this->targetMode = CameraAimAssistTargetMode::fromPacket($in->getByte());
 		$this->actionType = CameraAimAssistActionType::fromPacket($in->getByte());
-		$this->showDebugRender = $in->getBool();
+		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
+			$this->showDebugRender = $in->getBool();
+		}
 	}
 
 	protected function encodePayload(PacketSerializer $out) : void{
@@ -74,7 +76,9 @@ class CameraAimAssistPacket extends DataPacket implements ClientboundPacket{
 		$out->putLFloat($this->distance);
 		$out->putByte($this->targetMode->value);
 		$out->putByte($this->actionType->value);
-		$out->putBool($this->showDebugRender);
+		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
+			$out->putBool($this->showDebugRender);
+		}
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{
