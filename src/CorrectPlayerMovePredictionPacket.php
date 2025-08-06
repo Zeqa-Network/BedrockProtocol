@@ -30,7 +30,7 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 	private int $tick;
 	private int $predictionType;
 	private Vector2 $vehicleRotation;
-	private float $vehicleAngularVelocity;
+	private ?float $vehicleAngularVelocity;
 
 	/**
 	 * @generate-create-func
@@ -42,7 +42,7 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		int $tick,
 		int $predictionType,
 		Vector2 $vehicleRotation,
-		float $vehicleAngularVelocity,
+		?float $vehicleAngularVelocity,
 	) : self{
 		$result = new self;
 		$result->position = $position;
@@ -77,11 +77,7 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		$this->delta = $in->getVector3();
 		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80 && ($this->predictionType === self::PREDICTION_TYPE_VEHICLE || $in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100)){
 			$this->vehicleRotation = new Vector2($in->getFloat(), $in->getFloat());
-			if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
-				$this->vehicleAngularVelocity = $in->getFloat();
-			}elseif($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-				$this->vehicleAngularVelocity = $in->readOptional($in->getFloat(...)) ?? 0.0;
-			}
+			$this->vehicleAngularVelocity = $in->readOptional($in->getFloat(...)) ?? 0.0;
 		}
 		$this->onGround = $in->getBool();
 		$this->tick = $in->getUnsignedVarLong();
@@ -99,12 +95,7 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80 && ($this->predictionType === self::PREDICTION_TYPE_VEHICLE || $out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100)){
 			$out->putFloat($this->vehicleRotation->getX());
 			$out->putFloat($this->vehicleRotation->getY());
-
-			if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
-				$out->putFloat($this->vehicleAngularVelocity);
-			}elseif($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-				$out->writeOptional($this->vehicleAngularVelocity, $out->putFloat(...));
-			}
+			$out->writeOptional($this->vehicleAngularVelocity, $out->putFloat(...));
 		}
 		$out->putBool($this->onGround);
 		$out->putUnsignedVarLong($this->tick);
