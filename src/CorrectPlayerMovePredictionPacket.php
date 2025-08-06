@@ -67,7 +67,7 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 
 	public function getVehicleRotation() : Vector2{ return $this->vehicleRotation; }
 
-	public function getVehicleAngularVelocity() : float{ return $this->vehicleAngularVelocity; }
+	public function getVehicleAngularVelocity() : ?float{ return $this->vehicleAngularVelocity; }
 
 	protected function decodePayload(PacketSerializer $in) : void{
 		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80){
@@ -77,7 +77,7 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		$this->delta = $in->getVector3();
 		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_80 && ($this->predictionType === self::PREDICTION_TYPE_VEHICLE || $in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100)){
 			$this->vehicleRotation = new Vector2($in->getFloat(), $in->getFloat());
-			$this->vehicleAngularVelocity = $in->readOptional($in->getFloat(...)) ?? 0.0;
+			$this->vehicleAngularVelocity = $in->readOptional($in->getFloat(...));
 		}
 		$this->onGround = $in->getBool();
 		$this->tick = $in->getUnsignedVarLong();
