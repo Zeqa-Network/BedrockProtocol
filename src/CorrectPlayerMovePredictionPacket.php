@@ -74,7 +74,7 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 
 	public function getVehicleAngularVelocity() : ?float{ return $this->vehicleAngularVelocity; }
 
-	protected function decodePayload(ByteBufferReader $in, $protocolId) : void{
+	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_80){
 			$this->predictionType = Byte::readUnsigned($in);
 		}

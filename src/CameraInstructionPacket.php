@@ -87,7 +87,7 @@ class CameraInstructionPacket extends DataPacket implements ClientboundPacket{
 		$this->fade = $fadeTag === null ? null : CameraFadeInstruction::fromNBT($fadeTag);
 	}
 
-	protected function encodePayload(ByteBufferWriter $out, $protocolId) : void{
+	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_30){
 			CommonTypes::writeOptional($out, $this->set, fn(ByteBufferWriter $out, CameraSetInstruction $v) => $v->write($out, $protocolId));
 			CommonTypes::writeOptional($out, $this->clear, CommonTypes::putBool(...));
