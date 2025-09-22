@@ -25,5 +25,5 @@ abstract class RecipeWithTypeId{
 		return $this->typeId;
 	}
 
-	abstract public function encode(ByteBufferWriter $out) : void;
+	abstract public function encode(ByteBufferWriter $out, int $protocolId) : void;
 }

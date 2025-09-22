@@ -34,20 +34,20 @@ final class ItemStackResponseContainerInfo{
 	/** @return ItemStackResponseSlotInfo[] */
 	public function getSlots() : array{ return $this->slots; }
 
-	public static function read(ByteBufferReader $in) : self{
-		$containerName = FullContainerName::read($in);
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
+		$containerName = FullContainerName::read($in, $protocolId);
 		$slots = [];
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
-			$slots[] = ItemStackResponseSlotInfo::read($in);
+			$slots[] = ItemStackResponseSlotInfo::read($in, $protocolId);
 		}
 		return new self($containerName, $slots);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
-		$this->containerName->write($out);
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
+		$this->containerName->write($out, $protocolId);
 		VarInt::writeUnsignedInt($out, count($this->slots));
 		foreach($this->slots as $slot){
-			$slot->write($out);
+			$slot->write($out, $protocolId);
 		}
 	}
 }

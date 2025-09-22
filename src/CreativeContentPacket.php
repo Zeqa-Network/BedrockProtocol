@@ -62,7 +62,7 @@ class CreativeContentPacket extends DataPacket implements ClientboundPacket{
 
 		$this->items = [];
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
-			$this->items[] = CreativeItemEntry::read($in);
+			$this->items[] = CreativeItemEntry::read($in, $protocolId);
 		}
 	}
 
@@ -76,7 +76,7 @@ class CreativeContentPacket extends DataPacket implements ClientboundPacket{
 
 		VarInt::writeUnsignedInt($out, count($this->items));
 		foreach($this->items as $entry){
-			$entry->write($out);
+			$entry->write($out, $protocolId);
 		}
 	}
 

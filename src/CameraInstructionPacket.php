@@ -62,7 +62,7 @@ class CameraInstructionPacket extends DataPacket implements ClientboundPacket{
 
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_30){
-			$this->set = CommonTypes::readOptional($in, CameraSetInstruction::read(...));
+			$this->set = CommonTypes::readOptional($in, fn(ByteBufferReader $in) => CameraSetInstruction::read($in, $protocolId));
 			$this->clear = CommonTypes::readOptional($in, CommonTypes::getBool(...));
 			$this->fade = CommonTypes::readOptional($in, CameraFadeInstruction::read(...));
 			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
@@ -89,7 +89,7 @@ class CameraInstructionPacket extends DataPacket implements ClientboundPacket{
 
 	protected function encodePayload(ByteBufferWriter $out, $protocolId) : void{
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_30){
-			CommonTypes::writeOptional($out, $this->set, fn(ByteBufferWriter $out, CameraSetInstruction $v) => $v->write($out));
+			CommonTypes::writeOptional($out, $this->set, fn(ByteBufferWriter $out, CameraSetInstruction $v) => $v->write($out, $protocolId));
 			CommonTypes::writeOptional($out, $this->clear, CommonTypes::putBool(...));
 			CommonTypes::writeOptional($out, $this->fade, fn(ByteBufferWriter $out, CameraFadeInstruction $v) => $v->write($out));
 			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){

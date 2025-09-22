@@ -29,15 +29,15 @@ final class SubChunkPacketEntryWithCache{
 
 	public function getUsedBlobHash() : int{ return $this->usedBlobHash; }
 
-	public static function read(ByteBufferReader $in) : self{
-		$base = SubChunkPacketEntryCommon::read($in, true);
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
+		$base = SubChunkPacketEntryCommon::read($in, $protocolId, true);
 		$usedBlobHash = LE::readUnsignedLong($in);
 
 		return new self($base, $usedBlobHash);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
-		$this->base->write($out, true);
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
+		$this->base->write($out, $protocolId, true);
 		LE::writeUnsignedLong($out, $this->usedBlobHash);
 	}
 }

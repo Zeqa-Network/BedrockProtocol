@@ -293,10 +293,10 @@ class PlayerAuthInputPacket extends DataPacket implements ServerboundPacket{
 		$this->tick = VarInt::readUnsignedLong($in);
 		$this->delta = CommonTypes::getVector3($in);
 		if($this->inputFlags->get(PlayerAuthInputFlags::PERFORM_ITEM_INTERACTION)){
-			$this->itemInteractionData = ItemInteractionData::read($in);
+			$this->itemInteractionData = ItemInteractionData::read($in, $protocolId);
 		}
 		if($this->inputFlags->get(PlayerAuthInputFlags::PERFORM_ITEM_STACK_REQUEST)){
-			$this->itemStackRequest = ItemStackRequest::read($in);
+			$this->itemStackRequest = ItemStackRequest::read($in, $protocolId);
 		}
 		if($this->inputFlags->get(PlayerAuthInputFlags::PERFORM_BLOCK_ACTIONS)){
 			$this->blockActions = [];
@@ -311,7 +311,7 @@ class PlayerAuthInputPacket extends DataPacket implements ServerboundPacket{
 			}
 		}
 		if($this->inputFlags->get(PlayerAuthInputFlags::IN_CLIENT_PREDICTED_VEHICLE) && $protocolId >= ProtocolInfo::PROTOCOL_1_20_60){
-			$this->vehicleInfo = PlayerAuthInputVehicleInfo::read($in);
+			$this->vehicleInfo = PlayerAuthInputVehicleInfo::read($in, $protocolId);
 		}
 		$this->analogMoveVecX = LE::readFloat($in);
 		$this->analogMoveVecZ = LE::readFloat($in);
@@ -349,10 +349,10 @@ class PlayerAuthInputPacket extends DataPacket implements ServerboundPacket{
 		VarInt::writeUnsignedLong($out, $this->tick);
 		CommonTypes::putVector3($out, $this->delta);
 		if($this->itemInteractionData !== null){
-			$this->itemInteractionData->write($out);
+			$this->itemInteractionData->write($out, $protocolId);
 		}
 		if($this->itemStackRequest !== null){
-			$this->itemStackRequest->write($out);
+			$this->itemStackRequest->write($out, $protocolId);
 		}
 		if($this->blockActions !== null){
 			VarInt::writeSignedInt($out, count($this->blockActions));
@@ -362,7 +362,7 @@ class PlayerAuthInputPacket extends DataPacket implements ServerboundPacket{
 			}
 		}
 		if($this->vehicleInfo !== null && $protocolId >= ProtocolInfo::PROTOCOL_1_20_60){
-			$this->vehicleInfo->write($out);
+			$this->vehicleInfo->write($out, $protocolId);
 		}
 		LE::writeFloat($out, $this->analogMoveVecX);
 		LE::writeFloat($out, $this->analogMoveVecZ);

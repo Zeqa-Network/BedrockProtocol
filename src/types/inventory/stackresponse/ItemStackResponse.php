@@ -48,25 +48,25 @@ final class ItemStackResponse{
 	/** @return ItemStackResponseContainerInfo[] */
 	public function getContainerInfos() : array{ return $this->containerInfos; }
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$result = Byte::readUnsigned($in);
 		$requestId = CommonTypes::readItemStackRequestId($in);
 		$containerInfos = [];
 		if($result === self::RESULT_OK){
 			for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
-				$containerInfos[] = ItemStackResponseContainerInfo::read($in);
+				$containerInfos[] = ItemStackResponseContainerInfo::read($in, $protocolId);
 			}
 		}
 		return new self($result, $requestId, $containerInfos);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		Byte::writeUnsigned($out, $this->result);
 		CommonTypes::writeItemStackRequestId($out, $this->requestId);
 		if($this->result === self::RESULT_OK){
 			VarInt::writeUnsignedInt($out, count($this->containerInfos));
 			foreach($this->containerInfos as $containerInfo){
-				$containerInfo->write($out);
+				$containerInfo->write($out, $protocolId);
 			}
 		}
 	}

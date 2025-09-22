@@ -14,7 +14,11 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\biome;
 
-use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\LE;
+use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 final class BiomeConsolidatedFeatureData{
 
@@ -36,12 +40,12 @@ final class BiomeConsolidatedFeatureData{
 
 	public function canUseInternal() : bool{ return $this->useInternal; }
 
-	public static function read(PacketSerializer $in) : self{
+	public static function read(ByteBufferReader $in) : self{
 		$scatter = BiomeScatterParamData::read($in);
-		$feature = $in->getLShort();
-		$identifier = $in->getLShort();
-		$pass = $in->getUnsignedVarInt();
-		$useInternal = $in->getBool();
+		$feature = LE::readUnsignedShort($in);
+		$identifier = LE::readUnsignedShort($in);
+		$pass = VarInt::readUnsignedInt($in);
+		$useInternal = CommonTypes::getBool($in);
 
 		return new self(
 			$scatter,
@@ -52,11 +56,11 @@ final class BiomeConsolidatedFeatureData{
 		);
 	}
 
-	public function write(PacketSerializer $out) : void{
+	public function write(ByteBufferWriter $out) : void{
 		$this->scatter->write($out);
-		$out->putLShort($this->feature);
-		$out->putLShort($this->identifier);
-		$out->putUnsignedVarInt($this->pass);
-		$out->putBool($this->useInternal);
+		LE::writeUnsignedShort($out, $this->feature);
+		LE::writeUnsignedShort($out, $this->identifier);
+		VarInt::writeUnsignedInt($out, $this->pass);
+		CommonTypes::putBool($out, $this->useInternal);
 	}
 }

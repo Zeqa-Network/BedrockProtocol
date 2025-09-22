@@ -38,27 +38,29 @@ abstract class TransactionData{
 	 * @throws DataDecodeException
 	 * @throws PacketDecodeException
 	 */
-	final public function decode(ByteBufferReader $in) : void{
+	final public function decode(ByteBufferReader $in, int $protocolId) : void{
 		$actionCount = VarInt::readUnsignedInt($in);
 		for($i = 0; $i < $actionCount; ++$i){
 			$this->actions[] = (new NetworkInventoryAction())->read($in);
 		}
-		$this->decodeData($in);
+		$this->decodeData($in, $protocolId);
 	}
 
 	/**
+	 * @param int $protocolId *
+	 *
 	 * @throws DataDecodeException
 	 * @throws PacketDecodeException
 	 */
-	abstract protected function decodeData(ByteBufferReader $in) : void;
+	abstract protected function decodeData(ByteBufferReader $in, int $protocolId) : void;
 
-	final public function encode(ByteBufferWriter $out) : void{
+	final public function encode(ByteBufferWriter $out, int $protocolId) : void{
 		VarInt::writeUnsignedInt($out, count($this->actions));
 		foreach($this->actions as $action){
 			$action->write($out);
 		}
-		$this->encodeData($out);
+		$this->encodeData($out, $protocolId);
 	}
 
-	abstract protected function encodeData(ByteBufferWriter $out) : void;
+	abstract protected function encodeData(ByteBufferWriter $out, int $protocolId) : void;
 }

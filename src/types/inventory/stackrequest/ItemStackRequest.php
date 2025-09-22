@@ -54,38 +54,38 @@ final class ItemStackRequest{
 	 * @throws DataDecodeException
 	 * @throws PacketDecodeException
 	 */
-	private static function readAction(ByteBufferReader $in, int $typeId) : ItemStackRequestAction{
+	private static function readAction(ByteBufferReader $in, int $protocolId, int $typeId) : ItemStackRequestAction{
 		return match($typeId){
-			TakeStackRequestAction::ID => TakeStackRequestAction::read($in),
-			PlaceStackRequestAction::ID => PlaceStackRequestAction::read($in),
-			SwapStackRequestAction::ID => SwapStackRequestAction::read($in),
-			DropStackRequestAction::ID => DropStackRequestAction::read($in),
-			DestroyStackRequestAction::ID => DestroyStackRequestAction::read($in),
-			CraftingConsumeInputStackRequestAction::ID => CraftingConsumeInputStackRequestAction::read($in),
+			TakeStackRequestAction::ID => TakeStackRequestAction::read($in, $protocolId),
+			PlaceStackRequestAction::ID => PlaceStackRequestAction::read($in, $protocolId),
+			SwapStackRequestAction::ID => SwapStackRequestAction::read($in, $protocolId),
+			DropStackRequestAction::ID => DropStackRequestAction::read($in, $protocolId),
+			DestroyStackRequestAction::ID => DestroyStackRequestAction::read($in, $protocolId),
+			CraftingConsumeInputStackRequestAction::ID => CraftingConsumeInputStackRequestAction::read($in, $protocolId),
 			CraftingCreateSpecificResultStackRequestAction::ID => CraftingCreateSpecificResultStackRequestAction::read($in),
-			PlaceIntoBundleStackRequestAction::ID => PlaceIntoBundleStackRequestAction::read($in),
-			TakeFromBundleStackRequestAction::ID => TakeFromBundleStackRequestAction::read($in),
+			PlaceIntoBundleStackRequestAction::ID => PlaceIntoBundleStackRequestAction::read($in, $protocolId),
+			TakeFromBundleStackRequestAction::ID => TakeFromBundleStackRequestAction::read($in, $protocolId),
 			LabTableCombineStackRequestAction::ID => LabTableCombineStackRequestAction::read($in),
 			BeaconPaymentStackRequestAction::ID => BeaconPaymentStackRequestAction::read($in),
 			MineBlockStackRequestAction::ID => MineBlockStackRequestAction::read($in),
-			CraftRecipeStackRequestAction::ID => CraftRecipeStackRequestAction::read($in),
-			CraftRecipeAutoStackRequestAction::ID => CraftRecipeAutoStackRequestAction::read($in),
-			CreativeCreateStackRequestAction::ID => CreativeCreateStackRequestAction::read($in),
+			CraftRecipeStackRequestAction::ID => CraftRecipeStackRequestAction::read($in, $protocolId),
+			CraftRecipeAutoStackRequestAction::ID => CraftRecipeAutoStackRequestAction::read($in, $protocolId),
+			CreativeCreateStackRequestAction::ID => CreativeCreateStackRequestAction::read($in, $protocolId),
 			CraftRecipeOptionalStackRequestAction::ID => CraftRecipeOptionalStackRequestAction::read($in),
-			GrindstoneStackRequestAction::ID => GrindstoneStackRequestAction::read($in),
-			LoomStackRequestAction::ID => LoomStackRequestAction::read($in),
+			GrindstoneStackRequestAction::ID => GrindstoneStackRequestAction::read($in, $protocolId),
+			LoomStackRequestAction::ID => LoomStackRequestAction::read($in, $protocolId),
 			DeprecatedCraftingNonImplementedStackRequestAction::ID => DeprecatedCraftingNonImplementedStackRequestAction::read($in),
 			DeprecatedCraftingResultsStackRequestAction::ID => DeprecatedCraftingResultsStackRequestAction::read($in),
 			default => throw new PacketDecodeException("Unhandled item stack request action type $typeId"),
 		};
 	}
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$requestId = CommonTypes::readItemStackRequestId($in);
 		$actions = [];
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
 			$typeId = Byte::readUnsigned($in);
-			$actions[] = self::readAction($in, $typeId);
+			$actions[] = self::readAction($in, $protocolId, $typeId);
 		}
 		$filterStrings = [];
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
@@ -95,12 +95,12 @@ final class ItemStackRequest{
 		return new self($requestId, $actions, $filterStrings, $filterStringCause);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::writeItemStackRequestId($out, $this->requestId);
 		VarInt::writeUnsignedInt($out, count($this->actions));
 		foreach($this->actions as $action){
 			Byte::writeUnsigned($out, $action->getTypeId());
-			$action->write($out);
+			$action->write($out, $protocolId);
 		}
 		VarInt::writeUnsignedInt($out, count($this->filterStrings));
 		foreach($this->filterStrings as $string){

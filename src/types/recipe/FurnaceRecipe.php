@@ -60,7 +60,7 @@ final class FurnaceRecipe extends RecipeWithTypeId{
 		return new self($typeId, $inputId, $inputData, $output, $block);
 	}
 
-	public function encode(ByteBufferWriter $out) : void{
+	public function encode(ByteBufferWriter $out, int $protocolId) : void{
 		VarInt::writeSignedInt($out, $this->inputId);
 		if($this->getTypeId() === CraftingDataPacket::ENTRY_FURNACE_DATA){
 			VarInt::writeSignedInt($out, $this->inputMeta);

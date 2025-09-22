@@ -44,27 +44,27 @@ final class AbilitiesData{
 	 */
 	public function getAbilityLayers() : array{ return $this->abilityLayers; }
 
-	public static function decode(ByteBufferReader $in) : self{
+	public static function decode(ByteBufferReader $in, int $protocolId) : self{
 		$targetActorUniqueId = LE::readSignedLong($in); //WHY IS THIS NON-STANDARD?
 		$playerPermission = Byte::readUnsigned($in);
 		$commandPermission = Byte::readUnsigned($in);
 
 		$abilityLayers = [];
 		for($i = 0, $len = Byte::readUnsigned($in); $i < $len; $i++){
-			$abilityLayers[] = AbilitiesLayer::decode($in);
+			$abilityLayers[] = AbilitiesLayer::decode($in, $protocolId);
 		}
 
 		return new self($commandPermission, $playerPermission, $targetActorUniqueId, $abilityLayers);
 	}
 
-	public function encode(ByteBufferWriter $out) : void{
+	public function encode(ByteBufferWriter $out, int $protocolId) : void{
 		LE::writeSignedLong($out, $this->targetActorUniqueId);
 		Byte::writeUnsigned($out, $this->playerPermission);
 		Byte::writeUnsigned($out, $this->commandPermission);
 
 		Byte::writeUnsigned($out, count($this->abilityLayers));
 		foreach($this->abilityLayers as $abilityLayer){
-			$abilityLayer->encode($out);
+			$abilityLayer->encode($out, $protocolId);
 		}
 	}
 }

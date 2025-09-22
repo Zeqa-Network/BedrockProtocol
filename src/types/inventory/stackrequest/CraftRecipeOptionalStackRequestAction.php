@@ -47,7 +47,7 @@ final class CraftRecipeOptionalStackRequestAction extends ItemStackRequestAction
 		return new self($recipeId, $filterStringIndex);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::writeRecipeNetId($out, $this->recipeId);
 		LE::writeSignedInt($out, $this->filterStringIndex);
 	}

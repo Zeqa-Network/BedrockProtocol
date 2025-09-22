@@ -93,7 +93,7 @@ class ResourcePacksInfoPacket extends DataPacket implements ClientboundPacket{
 			$this->forceServerPacks = CommonTypes::getBool($in);
 			$behaviorPackCount = LE::readUnsignedShort($in);
 			while($behaviorPackCount-- > 0){
-				$this->behaviorPackEntries[] = BehaviorPackInfoEntry::read($in);
+				$this->behaviorPackEntries[] = BehaviorPackInfoEntry::read($in, $protocolId);
 			}
 		}
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_50){
@@ -129,7 +129,7 @@ class ResourcePacksInfoPacket extends DataPacket implements ClientboundPacket{
 			CommonTypes::putBool($out, $this->forceServerPacks);
 			LE::writeUnsignedShort($out, count($this->behaviorPackEntries));
 			foreach($this->behaviorPackEntries as $entry){
-				$entry->write($out);
+				$entry->write($out, $protocolId);
 			}
 		}
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_50){

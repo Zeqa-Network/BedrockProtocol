@@ -62,7 +62,7 @@ class UseItemOnEntityTransactionData extends TransactionData{
 		return $this->clickPosition;
 	}
 
-	protected function decodeData(ByteBufferReader $in) : void{
+	protected function decodeData(ByteBufferReader $in, int $protocolId) : void{
 		$this->actorRuntimeId = CommonTypes::getActorRuntimeId($in);
 		$this->actionType = VarInt::readUnsignedInt($in);
 		$this->hotbarSlot = VarInt::readSignedInt($in);
@@ -71,7 +71,7 @@ class UseItemOnEntityTransactionData extends TransactionData{
 		$this->clickPosition = CommonTypes::getVector3($in);
 	}
 
-	protected function encodeData(ByteBufferWriter $out) : void{
+	protected function encodeData(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::putActorRuntimeId($out, $this->actorRuntimeId);
 		VarInt::writeUnsignedInt($out, $this->actionType);
 		VarInt::writeSignedInt($out, $this->hotbarSlot);

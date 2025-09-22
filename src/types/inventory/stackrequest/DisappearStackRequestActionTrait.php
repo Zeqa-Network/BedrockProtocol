@@ -28,14 +28,14 @@ trait DisappearStackRequestActionTrait{
 
 	final public function getSource() : ItemStackRequestSlotInfo{ return $this->source; }
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$count = Byte::readUnsigned($in);
-		$source = ItemStackRequestSlotInfo::read($in);
+		$source = ItemStackRequestSlotInfo::read($in, $protocolId);
 		return new self($count, $source);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		Byte::writeUnsigned($out, $this->count);
-		$this->source->write($out);
+		$this->source->write($out, $protocolId);
 	}
 }

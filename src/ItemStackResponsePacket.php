@@ -42,14 +42,14 @@ class ItemStackResponsePacket extends DataPacket implements ClientboundPacket{
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->responses = [];
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
-			$this->responses[] = ItemStackResponse::read($in);
+			$this->responses[] = ItemStackResponse::read($in, $protocolId);
 		}
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
 		VarInt::writeUnsignedInt($out, count($this->responses));
 		foreach($this->responses as $response){
-			$response->write($out);
+			$response->write($out, $protocolId);
 		}
 	}
 

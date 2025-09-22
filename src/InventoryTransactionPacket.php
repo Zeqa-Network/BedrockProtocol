@@ -76,7 +76,7 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 			default => throw new PacketDecodeException("Unknown transaction type $transactionType"),
 		};
 
-		$this->trData->decode($in);
+		$this->trData->decode($in, $protocolId);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
@@ -90,7 +90,7 @@ class InventoryTransactionPacket extends DataPacket implements ClientboundPacket
 
 		VarInt::writeUnsignedInt($out, $this->trData->getTypeId());
 
-		$this->trData->encode($out);
+		$this->trData->encode($out, $protocolId);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

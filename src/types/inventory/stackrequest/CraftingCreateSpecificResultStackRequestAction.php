@@ -46,7 +46,7 @@ final class CraftingCreateSpecificResultStackRequestAction extends ItemStackRequ
 		return new self($slot);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		Byte::writeUnsigned($out, $this->resultIndex);
 	}
 }

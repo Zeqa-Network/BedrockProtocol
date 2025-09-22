@@ -31,16 +31,16 @@ trait TakeOrPlaceStackRequestActionTrait{
 
 	final public function getDestination() : ItemStackRequestSlotInfo{ return $this->destination; }
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$count = Byte::readUnsigned($in);
-		$src = ItemStackRequestSlotInfo::read($in);
-		$dst = ItemStackRequestSlotInfo::read($in);
+		$src = ItemStackRequestSlotInfo::read($in, $protocolId);
+		$dst = ItemStackRequestSlotInfo::read($in, $protocolId);
 		return new self($count, $src, $dst);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		Byte::writeUnsigned($out, $this->count);
-		$this->source->write($out);
-		$this->destination->write($out);
+		$this->source->write($out, $protocolId);
+		$this->destination->write($out, $protocolId);
 	}
 }

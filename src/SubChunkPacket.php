@@ -61,13 +61,13 @@ class SubChunkPacket extends DataPacket implements ClientboundPacket{
 		if($cacheEnabled){
 			$entries = [];
 			for($i = 0; $i < $count; $i++){
-				$entries[] = EntryWithBlobHash::read($in);
+				$entries[] = EntryWithBlobHash::read($in, $protocolId);
 			}
 			$this->entries = new ListWithBlobHashes($entries);
 		}else{
 			$entries = [];
 			for($i = 0; $i < $count; $i++){
-				$entries[] = EntryWithoutBlobHash::read($in);
+				$entries[] = EntryWithoutBlobHash::read($in, $protocolId);
 			}
 			$this->entries = new ListWithoutBlobHashes($entries);
 		}
@@ -81,7 +81,7 @@ class SubChunkPacket extends DataPacket implements ClientboundPacket{
 		LE::writeUnsignedInt($out, count($this->entries->getEntries()));
 
 		foreach($this->entries->getEntries() as $entry){
-			$entry->write($out);
+			$entry->write($out, $protocolId);
 		}
 	}
 

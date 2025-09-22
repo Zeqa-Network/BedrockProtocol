@@ -69,7 +69,7 @@ final class SmithingTransformRecipe extends RecipeWithTypeId{
 		);
 	}
 
-	public function encode(ByteBufferWriter $out) : void{
+	public function encode(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::putString($out, $this->recipeId);
 		CommonTypes::putRecipeIngredient($out, $this->template);
 		CommonTypes::putRecipeIngredient($out, $this->input);

@@ -44,7 +44,7 @@ class UpdateAttributesPacket extends DataPacket implements ClientboundPacket{
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->actorRuntimeId = CommonTypes::getActorRuntimeId($in);
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
-			$this->entries[] = UpdateAttribute::read($in);
+			$this->entries[] = UpdateAttribute::read($in, $protocolId);
 		}
 		$this->tick = VarInt::readUnsignedLong($in);
 	}
@@ -53,7 +53,7 @@ class UpdateAttributesPacket extends DataPacket implements ClientboundPacket{
 		CommonTypes::putActorRuntimeId($out, $this->actorRuntimeId);
 		VarInt::writeUnsignedInt($out, count($this->entries));
 		foreach($this->entries as $entry){
-			$entry->write($out);
+			$entry->write($out, $protocolId);
 		}
 		VarInt::writeUnsignedLong($out, $this->tick);
 	}

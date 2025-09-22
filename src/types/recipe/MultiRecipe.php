@@ -56,7 +56,7 @@ final class MultiRecipe extends RecipeWithTypeId{
 		return new self($typeId, $uuid, $recipeNetId);
 	}
 
-	public function encode(ByteBufferWriter $out) : void{
+	public function encode(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::putUUID($out, $this->recipeId);
 		CommonTypes::writeRecipeNetId($out, $this->recipeNetId);
 	}

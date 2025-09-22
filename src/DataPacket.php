@@ -99,7 +99,9 @@ abstract class DataPacket implements Packet{
 	/**
 	 * Encodes the packet body, without the packet ID or other generic header fields.
 	 *
-	 * @param int $protocolId*/
+	 * @param ByteBufferWriter $out
+	 * @param int              $protocolId
+	 */
 	abstract protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void;
 
 	/**

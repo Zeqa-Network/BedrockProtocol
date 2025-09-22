@@ -44,7 +44,7 @@ final class MineBlockStackRequestAction extends ItemStackRequestAction{
 		return new self($hotbarSlot, $predictedDurability, $stackId);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		VarInt::writeSignedInt($out, $this->hotbarSlot);
 		VarInt::writeSignedInt($out, $this->predictedDurability);
 		CommonTypes::writeItemStackNetIdVariant($out, $this->stackId);

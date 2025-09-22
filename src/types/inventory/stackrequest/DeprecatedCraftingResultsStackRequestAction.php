@@ -54,7 +54,7 @@ final class DeprecatedCraftingResultsStackRequestAction extends ItemStackRequest
 		return new self($results, $iterations);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		VarInt::writeUnsignedInt($out, count($this->results));
 		foreach($this->results as $result){
 			CommonTypes::putItemStackWithoutStackId($out, $result);

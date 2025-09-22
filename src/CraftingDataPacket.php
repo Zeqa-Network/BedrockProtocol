@@ -79,8 +79,8 @@ class CraftingDataPacket extends DataPacket implements ClientboundPacket{
 			$recipeType = VarInt::readSignedInt($in);
 
 			$this->recipesWithTypeIds[] = match($recipeType){
-				self::ENTRY_SHAPELESS, self::ENTRY_USER_DATA_SHAPELESS, self::ENTRY_SHAPELESS_CHEMISTRY => ShapelessRecipe::decode($recipeType, $in),
-				self::ENTRY_SHAPED, self::ENTRY_SHAPED_CHEMISTRY => ShapedRecipe::decode($recipeType, $in),
+				self::ENTRY_SHAPELESS, self::ENTRY_USER_DATA_SHAPELESS, self::ENTRY_SHAPELESS_CHEMISTRY => ShapelessRecipe::decode($recipeType, $in, $protocolId),
+				self::ENTRY_SHAPED, self::ENTRY_SHAPED_CHEMISTRY => ShapedRecipe::decode($recipeType, $in, $protocolId),
 				self::ENTRY_FURNACE, self::ENTRY_FURNACE_DATA => FurnaceRecipe::decode($recipeType, $in),
 				self::ENTRY_MULTI => MultiRecipe::decode($recipeType, $in),
 				self::ENTRY_SMITHING_TRANSFORM => SmithingTransformRecipe::decode($recipeType, $in),
@@ -122,7 +122,7 @@ class CraftingDataPacket extends DataPacket implements ClientboundPacket{
 		VarInt::writeUnsignedInt($out, count($this->recipesWithTypeIds));
 		foreach($this->recipesWithTypeIds as $d){
 			VarInt::writeSignedInt($out, $d->getTypeId());
-			$d->encode($out);
+			$d->encode($out, $protocolId);
 		}
 		VarInt::writeUnsignedInt($out, count($this->potionTypeRecipes));
 		foreach($this->potionTypeRecipes as $recipe){

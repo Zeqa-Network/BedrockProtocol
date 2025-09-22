@@ -40,16 +40,16 @@ final class DropStackRequestAction extends ItemStackRequestAction{
 
 	public function isRandomly() : bool{ return $this->randomly; }
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$count = Byte::readUnsigned($in);
-		$source = ItemStackRequestSlotInfo::read($in);
+		$source = ItemStackRequestSlotInfo::read($in, $protocolId);
 		$random = CommonTypes::getBool($in);
 		return new self($count, $source, $random);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
 		Byte::writeUnsigned($out, $this->count);
-		$this->source->write($out);
+		$this->source->write($out, $protocolId);
 		CommonTypes::putBool($out, $this->randomly);
 	}
 }

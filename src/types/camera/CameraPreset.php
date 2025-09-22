@@ -136,7 +136,7 @@ final class CameraPreset{
 		$playerEffects = CommonTypes::readOptional($in, CommonTypes::getBool(...));
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_40){
 			if($protocolId <= ProtocolInfo::PROTOCOL_1_21_80){
-				$alignTargetAndCameraForward = $in->readOptional($in->getBool(...));
+				$alignTargetAndCameraForward = CommonTypes::readOptional($in, CommonTypes::getBool(...));
 			}
 			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_50){
 				if($protocolId >= ProtocolInfo::PROTOCOL_1_21_60){
@@ -145,7 +145,7 @@ final class CameraPreset{
 						$controlScheme = CommonTypes::readOptional($in, fn() => ControlScheme::fromPacket(Byte::readUnsigned($in)));
 					}
 				}else{
-					$aimAssist = $in->readOptional(fn() => $in->getBool() ? new CameraPresetAimAssist(null, null, null, null) : null);
+					$aimAssist = CommonTypes::readOptional($in, fn() =>  CommonTypes::getBool($in) ? new CameraPresetAimAssist(null, null, null, null) : null);
 				}
 			}
 		}
