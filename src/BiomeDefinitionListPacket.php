@@ -58,7 +58,6 @@ class BiomeDefinitionListPacket extends DataPacket implements ClientboundPacket{
 		return $result;
 	}
 
-
 	/**
 	 * @param BiomeDefinitionData[] $definitionData
 	 * @param string[] 				$strings

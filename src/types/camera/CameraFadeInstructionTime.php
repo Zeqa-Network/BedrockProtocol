@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\camera;
 
-use pocketmine\nbt\tag\CompoundTag;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
+use pocketmine\nbt\tag\CompoundTag;
 
 final class CameraFadeInstructionTime{
 

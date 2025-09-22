@@ -16,8 +16,8 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\camera\CameraFadeInstruction;
 use pocketmine\network\mcpe\protocol\types\camera\CameraFovInstruction;

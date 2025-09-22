@@ -20,9 +20,9 @@ use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\ControlScheme;
 
 final class CameraPreset{
@@ -145,7 +145,7 @@ final class CameraPreset{
 						$controlScheme = CommonTypes::readOptional($in, fn() => ControlScheme::fromPacket(Byte::readUnsigned($in)));
 					}
 				}else{
-					$aimAssist = CommonTypes::readOptional($in, fn() =>  CommonTypes::getBool($in) ? new CameraPresetAimAssist(null, null, null, null) : null);
+					$aimAssist = CommonTypes::readOptional($in, fn() => CommonTypes::getBool($in) ? new CameraPresetAimAssist(null, null, null, null) : null);
 				}
 			}
 		}

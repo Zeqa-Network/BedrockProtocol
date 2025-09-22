@@ -17,8 +17,8 @@ namespace pocketmine\network\mcpe\protocol\types\inventory;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 final class CreativeItemEntry{
 	public function __construct(

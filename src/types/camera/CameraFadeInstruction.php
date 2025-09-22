@@ -50,8 +50,6 @@ final class CameraFadeInstruction{
 		);
 	}
 
-
-
 	public function write(ByteBufferWriter $out) : void{
 		CommonTypes::writeOptional($out, $this->time, fn(ByteBufferWriter $out, Time $v) => $v->write($out));
 		CommonTypes::writeOptional($out, $this->color, fn(ByteBufferWriter $out, Color $v) => $v->write($out));

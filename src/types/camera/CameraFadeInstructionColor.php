@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\camera;
 
-use pocketmine\nbt\tag\CompoundTag;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
+use pocketmine\nbt\tag\CompoundTag;
 
 final class CameraFadeInstructionColor{
 
@@ -46,7 +46,6 @@ final class CameraFadeInstructionColor{
 		$blue = $nbt->getFloat("blue");
 		return new self($red, $green, $blue);
 	}
-
 
 	public function write(ByteBufferWriter $out) : void{
 		LE::writeFloat($out, $this->red);

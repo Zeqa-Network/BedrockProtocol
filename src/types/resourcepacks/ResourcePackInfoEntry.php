@@ -17,8 +17,8 @@ namespace pocketmine\network\mcpe\protocol\types\resourcepacks;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
-use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 

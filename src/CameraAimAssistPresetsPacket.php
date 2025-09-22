@@ -60,7 +60,7 @@ class CameraAimAssistPresetsPacket extends DataPacket implements ClientboundPack
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->categories = [];
 		for($i = 0, $count = VarInt::readUnsignedInt($in); $i < $count; ++$i){
-			if($protocolId  >= ProtocolInfo::PROTOCOL_1_21_80){
+			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_80){
 				$this->categories[] = CameraAimAssistCategory::read($in);
 			}else{
 				$categories = CameraAimAssistCategories::read($in);

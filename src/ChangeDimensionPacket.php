@@ -47,7 +47,7 @@ class ChangeDimensionPacket extends DataPacket implements ClientboundPacket{
 		$this->dimension = VarInt::readSignedInt($in);
 		$this->position = CommonTypes::getVector3($in);
 		$this->respawn = CommonTypes::getBool($in);
-		if($protocolId  >= ProtocolInfo::PROTOCOL_1_21_20){
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
 			$this->loadingScreenId = CommonTypes::readOptional($in, LE::readUnsignedInt(...));
 		}
 	}
@@ -56,7 +56,7 @@ class ChangeDimensionPacket extends DataPacket implements ClientboundPacket{
 		VarInt::writeSignedInt($out, $this->dimension);
 		CommonTypes::putVector3($out, $this->position);
 		CommonTypes::putBool($out, $this->respawn);
-		if($protocolId  >= ProtocolInfo::PROTOCOL_1_21_20){
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
 			CommonTypes::writeOptional($out, $this->loadingScreenId, LE::writeUnsignedInt(...));
 		}
 	}
