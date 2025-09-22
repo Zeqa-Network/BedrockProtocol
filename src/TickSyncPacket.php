@@ -48,12 +48,12 @@ class TickSyncPacket extends DataPacket implements ClientboundPacket, Serverboun
 		return $this->serverReceiveTime;
 	}
 
-	protected function decodePayload(PacketSerializer $in) : void{
+	protected function decodePayload(PacketSerializer $in, int $protocolId) : void{
 		$this->clientSendTime = $in->getLLong();
 		$this->serverReceiveTime = $in->getLLong();
 	}
 
-	protected function encodePayload(PacketSerializer $out) : void{
+	protected function encodePayload(PacketSerializer $out, int $protocolId) : void{
 		$out->putLLong($this->clientSendTime);
 		$out->putLLong($this->serverReceiveTime);
 	}

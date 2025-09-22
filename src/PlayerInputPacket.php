@@ -36,14 +36,14 @@ class PlayerInputPacket extends DataPacket implements ServerboundPacket{
 		return $result;
 	}
 
-	protected function decodePayload(PacketSerializer $in) : void{
+	protected function decodePayload(PacketSerializer $in, int $protocolId) : void{
 		$this->motionX = $in->getLFloat();
 		$this->motionY = $in->getLFloat();
 		$this->jumping = $in->getBool();
 		$this->sneaking = $in->getBool();
 	}
 
-	protected function encodePayload(PacketSerializer $out) : void{
+	protected function encodePayload(PacketSerializer $out, int $protocolId) : void{
 		$out->putLFloat($this->motionX);
 		$out->putLFloat($this->motionY);
 		$out->putBool($this->jumping);

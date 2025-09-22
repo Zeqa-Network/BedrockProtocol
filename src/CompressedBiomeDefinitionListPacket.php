@@ -42,11 +42,11 @@ class CompressedBiomeDefinitionListPacket extends DataPacket implements Clientbo
 
 	public function getPayload() : string{ return $this->payload; }
 
-	protected function decodePayload(PacketSerializer $in) : void{
+	protected function decodePayload(PacketSerializer $in, int $protocolId) : void{
 		$this->payload = $in->getString();
 	}
 
-	protected function encodePayload(PacketSerializer $out) : void{
+	protected function encodePayload(PacketSerializer $out, int $protocolId) : void{
 		$out->putString($this->payload);
 	}
 

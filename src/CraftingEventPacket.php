@@ -45,7 +45,7 @@ class CraftingEventPacket extends DataPacket implements ServerboundPacket{
 		return $result;
 	}
 
-	protected function decodePayload(PacketSerializer $in) : void{
+	protected function decodePayload(PacketSerializer $in, int $protocolId) : void{
 		$this->windowId = $in->getByte();
 		$this->windowType = $in->getVarInt();
 		$this->recipeUUID = $in->getUUID();
@@ -61,7 +61,7 @@ class CraftingEventPacket extends DataPacket implements ServerboundPacket{
 		}
 	}
 
-	protected function encodePayload(PacketSerializer $out) : void{
+	protected function encodePayload(PacketSerializer $out, int $protocolId) : void{
 		$out->putByte($this->windowId);
 		$out->putVarInt($this->windowType);
 		$out->putUUID($this->recipeUUID);

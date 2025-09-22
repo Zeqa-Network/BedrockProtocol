@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol;
 
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\camera\CameraFadeInstruction;
 use pocketmine\network\mcpe\protocol\types\camera\CameraFovInstruction;
@@ -58,20 +60,20 @@ class CameraInstructionPacket extends DataPacket implements ClientboundPacket{
 
 	public function getFieldOfView() : ?CameraFovInstruction{ return $this->fieldOfView; }
 
-	protected function decodePayload(PacketSerializer $in) : void{
-		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_30){
-			$this->set = $in->readOptional(fn() => CameraSetInstruction::read($in));
-			$this->clear = $in->readOptional($in->getBool(...));
-			$this->fade = $in->readOptional(fn() => CameraFadeInstruction::read($in));
-			if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-				$this->target = $in->readOptional(fn() => CameraTargetInstruction::read($in));
-				$this->removeTarget = $in->readOptional($in->getBool(...));
-				if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
-					$this->fieldOfView = $in->readOptional(fn() => CameraFovInstruction::read($in));
+	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_30){
+			$this->set = CommonTypes::readOptional($in, CameraSetInstruction::read(...));
+			$this->clear = CommonTypes::readOptional($in, CommonTypes::getBool(...));
+			$this->fade = CommonTypes::readOptional($in, CameraFadeInstruction::read(...));
+			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+				$this->target = CommonTypes::readOptional($in, CameraTargetInstruction::read(...));
+				$this->removeTarget = CommonTypes::readOptional($in, CommonTypes::getBool(...));
+				if($protocolId >= ProtocolInfo::PROTOCOL_1_21_100){
+					$this->fieldOfView = CommonTypes::readOptional($in, CameraFovInstruction::read(...));
 				}
 			}
 		}else{
-			$this->fromNBT($in->getNbtCompoundRoot());
+			$this->fromNBT(CommonTypes::getNbtCompoundRoot($in));
 		}
 	}
 
@@ -85,21 +87,21 @@ class CameraInstructionPacket extends DataPacket implements ClientboundPacket{
 		$this->fade = $fadeTag === null ? null : CameraFadeInstruction::fromNBT($fadeTag);
 	}
 
-	protected function encodePayload(PacketSerializer $out) : void{
-		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_20_30){
-			$out->writeOptional($this->set, fn(CameraSetInstruction $v) => $v->write($out));
-			$out->writeOptional($this->clear, $out->putBool(...));
-			$out->writeOptional($this->fade, fn(CameraFadeInstruction $v) => $v->write($out));
-			if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-				$out->writeOptional($this->target, fn(CameraTargetInstruction $v) => $v->write($out));
-				$out->writeOptional($this->removeTarget, $out->putBool(...));
-				if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_100){
-					$out->writeOptional($this->fieldOfView, fn(CameraFovInstruction $v) => $v->write($out));
+	protected function encodePayload(ByteBufferWriter $out, $protocolId) : void{
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_30){
+			CommonTypes::writeOptional($out, $this->set, fn(ByteBufferWriter $out, CameraSetInstruction $v) => $v->write($out));
+			CommonTypes::writeOptional($out, $this->clear, CommonTypes::putBool(...));
+			CommonTypes::writeOptional($out, $this->fade, fn(ByteBufferWriter $out, CameraFadeInstruction $v) => $v->write($out));
+			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+				CommonTypes::writeOptional($out, $this->target, fn(ByteBufferWriter $out, CameraTargetInstruction $v) => $v->write($out));
+				CommonTypes::writeOptional($out, $this->removeTarget, CommonTypes::putBool(...));
+				if($protocolId >= ProtocolInfo::PROTOCOL_1_21_100){
+					CommonTypes::writeOptional($out, $this->fieldOfView, fn(ByteBufferWriter $out, CameraFovInstruction $v) => $v->write($out));
 				}
 			}
 		}else{
 			$data = new CacheableNbt($this->toNBT());
-			$out->put($data->getEncodedNbt());
+			$out->writeByteArray($data->getEncodedNbt());
 		}
 	}
 

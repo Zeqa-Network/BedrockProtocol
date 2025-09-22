@@ -33,11 +33,11 @@ class SetMovementAuthorityPacket extends DataPacket implements ClientboundPacket
 
 	public function getMode() : ServerAuthMovementMode{ return $this->mode; }
 
-	protected function decodePayload(PacketSerializer $in) : void{
+	protected function decodePayload(PacketSerializer $in, int $protocolId) : void{
 		$this->mode = ServerAuthMovementMode::fromPacket($in->getByte());
 	}
 
-	protected function encodePayload(PacketSerializer $out) : void{
+	protected function encodePayload(PacketSerializer $out, int $protocolId) : void{
 		$out->putByte($this->mode->value);
 	}
 

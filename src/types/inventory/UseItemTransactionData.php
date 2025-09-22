@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\inventory;
 
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
-use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
 
@@ -77,37 +80,38 @@ class UseItemTransactionData extends TransactionData{
 
 	public function getClientInteractPrediction() : PredictedResult{ return $this->clientInteractPrediction; }
 
-	protected function decodeData(PacketSerializer $stream) : void{
-		$this->actionType = $stream->getUnsignedVarInt();
-		if($stream->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-			$this->triggerType = TriggerType::fromPacket($stream->getUnsignedVarInt());
+	protected function decodeData(ByteBufferReader $in, int $protocolId) : void{
+		$this->actionType = VarInt::readUnsignedInt($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+			$this->triggerType = TriggerType::fromPacket(VarInt::readUnsignedInt($in));
 		}
-		$this->blockPosition = $stream->getBlockPosition();
-		$this->face = $stream->getVarInt();
-		$this->hotbarSlot = $stream->getVarInt();
-		$this->itemInHand = $stream->getItemStackWrapper();
-		$this->playerPosition = $stream->getVector3();
-		$this->clickPosition = $stream->getVector3();
-		$this->blockRuntimeId = $stream->getUnsignedVarInt();
-		if($stream->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-			$this->clientInteractPrediction = PredictedResult::fromPacket($stream->getUnsignedVarInt());
+		$this->blockPosition = CommonTypes::getBlockPosition($in);
+		$this->face = VarInt::readSignedInt($in);
+		$this->hotbarSlot = VarInt::readSignedInt($in);
+		$this->itemInHand = CommonTypes::getItemStackWrapper($in);
+		$this->playerPosition = CommonTypes::getVector3($in);
+		$this->clickPosition = CommonTypes::getVector3($in);
+		$this->blockRuntimeId = VarInt::readUnsignedInt($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+			$this->clientInteractPrediction = PredictedResult::fromPacket(VarInt::readUnsignedInt($in));
 		}
 	}
 
-	protected function encodeData(PacketSerializer $stream) : void{
-		$stream->putUnsignedVarInt($this->actionType);
-		if($stream->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-			$stream->putUnsignedVarInt($this->triggerType->value);
+	protected function encodeData(ByteBufferWriter $out, int $protocolId) : void{
+		VarInt::writeUnsignedInt($out, $this->actionType);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+			VarInt::writeUnsignedInt($out, $this->triggerType->value);
 		}
-		$stream->putBlockPosition($this->blockPosition);
-		$stream->putVarInt($this->face);
-		$stream->putVarInt($this->hotbarSlot);
-		$stream->putItemStackWrapper($this->itemInHand);
-		$stream->putVector3($this->playerPosition);
-		$stream->putVector3($this->clickPosition);
-		$stream->putUnsignedVarInt($this->blockRuntimeId);
-		if($stream->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-			$stream->putUnsignedVarInt($this->clientInteractPrediction->value);
+		CommonTypes::putBlockPosition($out, $this->blockPosition);
+		VarInt::writeSignedInt($out, $this->face);
+		VarInt::writeSignedInt($out, $this->hotbarSlot);
+		CommonTypes::putItemStackWrapper($out, $this->itemInHand);
+		CommonTypes::putVector3($out, $this->playerPosition);
+		CommonTypes::putVector3($out, $this->clickPosition);
+		VarInt::writeUnsignedInt($out, $this->blockRuntimeId);
+		VarInt::writeUnsignedInt($out, $this->clientInteractPrediction->value);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+			VarInt::writeUnsignedInt($out, $this->clientInteractPrediction->value);
 		}
 	}
 
