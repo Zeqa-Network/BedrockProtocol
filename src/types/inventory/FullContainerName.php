@@ -14,8 +14,12 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol\types\inventory;
 
+use pmmp\encoding\Byte;
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\LE;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
-use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 final class FullContainerName{
 	public function __construct(
@@ -27,22 +31,22 @@ final class FullContainerName{
 
 	public function getDynamicId() : ?int{ return $this->dynamicId; }
 
-	public static function read(PacketSerializer $in) : self{
-		$containerId = $in->getByte();
-		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_30){
-			$dynamicId = $in->readOptional($in->getLInt(...));
-		}elseif($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-			$dynamicId = $in->getLInt();
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
+		$containerId = Byte::readUnsigned($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_30){
+			$dynamicId = CommonTypes::readOptional($in, LE::readUnsignedInt(...));
+		}elseif($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+			$dynamicId = LE::readUnsignedInt($in);
 		}
 		return new self($containerId, $dynamicId ?? null);
 	}
 
-	public function write(PacketSerializer $out) : void{
-		$out->putByte($this->containerId);
-		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_30){
-			$out->writeOptional($this->dynamicId, $out->putLInt(...));
-		}elseif($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
-			$out->putLInt($this->dynamicId ?? 0);
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
+		Byte::writeUnsigned($out, $this->containerId);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_30){
+			CommonTypes::writeOptional($out, $this->dynamicId, LE::writeUnsignedInt(...));
+		}elseif($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+			LE::writeUnsignedInt($out, $this->dynamicId ?? 0);
 		}
 	}
 }

@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe\protocol;
 
-use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+use pmmp\encoding\Byte;
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\VarInt;
 
 class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::PLAYER_ARMOR_DAMAGE_PACKET;
@@ -54,21 +57,21 @@ class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 
 	public function getBodySlotDamage() : ?int{ return $this->bodySlotDamage; }
 
-	private function maybeReadDamage(int $flags, int $flag, PacketSerializer $in) : ?int{
+	private function maybeReadDamage(int $flags, int $flag, ByteBufferReader $in) : ?int{
 		if(($flags & (1 << $flag)) !== 0){
-			return $in->getVarInt();
+			return VarInt::readSignedInt($in);
 		}
 		return null;
 	}
 
-	protected function decodePayload(PacketSerializer $in) : void{
-		$flags = $in->getByte();
+	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
+		$flags = Byte::readUnsigned($in);
 
 		$this->headSlotDamage = $this->maybeReadDamage($flags, self::FLAG_HEAD, $in);
 		$this->chestSlotDamage = $this->maybeReadDamage($flags, self::FLAG_CHEST, $in);
 		$this->legsSlotDamage = $this->maybeReadDamage($flags, self::FLAG_LEGS, $in);
 		$this->feetSlotDamage = $this->maybeReadDamage($flags, self::FLAG_FEET, $in);
-		if($in->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
 			$this->bodySlotDamage = $this->maybeReadDamage($flags, self::FLAG_BODY, $in);
 		}
 	}
@@ -77,26 +80,26 @@ class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 		return $field !== null ? (1 << $flag) : 0;
 	}
 
-	private function maybeWriteDamage(?int $field, PacketSerializer $out) : void{
+	private function maybeWriteDamage(?int $field, ByteBufferWriter $out) : void{
 		if($field !== null){
-			$out->putVarInt($field);
+			VarInt::writeSignedInt($out, $field);
 		}
 	}
 
-	protected function encodePayload(PacketSerializer $out) : void{
-		$out->putByte(
+	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
+		Byte::writeUnsigned($out,
 			$this->composeFlag($this->headSlotDamage, self::FLAG_HEAD) |
 			$this->composeFlag($this->chestSlotDamage, self::FLAG_CHEST) |
 			$this->composeFlag($this->legsSlotDamage, self::FLAG_LEGS) |
 			$this->composeFlag($this->feetSlotDamage, self::FLAG_FEET) |
-			($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20 ? $this->composeFlag($this->bodySlotDamage, self::FLAG_BODY) : 0)
+			($protocolId >= ProtocolInfo::PROTOCOL_1_21_20 ? $this->composeFlag($this->bodySlotDamage, self::FLAG_BODY) : 0)
 		);
 
 		$this->maybeWriteDamage($this->headSlotDamage, $out);
 		$this->maybeWriteDamage($this->chestSlotDamage, $out);
 		$this->maybeWriteDamage($this->legsSlotDamage, $out);
 		$this->maybeWriteDamage($this->feetSlotDamage, $out);
-		if($out->getProtocolId() >= ProtocolInfo::PROTOCOL_1_21_20){
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
 			$this->maybeWriteDamage($this->bodySlotDamage, $out);
 		}
 	}
