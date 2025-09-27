@@ -26,6 +26,7 @@ use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
 use pocketmine\network\mcpe\protocol\PacketDecodeException;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\BoolGameRule;
 use pocketmine\network\mcpe\protocol\types\command\CommandOriginData;
@@ -589,23 +590,27 @@ final class CommonTypes{
 	}
 
 	/** @throws DataDecodeException */
-	public static function getEntityLink(ByteBufferReader $in) : EntityLink{
+	public static function getEntityLink(ByteBufferReader $in, int $protocolId) : EntityLink{
 		$fromActorUniqueId = self::getActorUniqueId($in);
 		$toActorUniqueId = self::getActorUniqueId($in);
 		$type = Byte::readUnsigned($in);
 		$immediate = self::getBool($in);
 		$causedByRider = self::getBool($in);
-		$vehicleAngularVelocity = LE::readFloat($in);
-		return new EntityLink($fromActorUniqueId, $toActorUniqueId, $type, $immediate, $causedByRider, $vehicleAngularVelocity);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+			$vehicleAngularVelocity = LE::readFloat($in);
+		}
+		return new EntityLink($fromActorUniqueId, $toActorUniqueId, $type, $immediate, $causedByRider, $vehicleAngularVelocity ?? 0);
 	}
 
-	public static function putEntityLink(ByteBufferWriter $out, EntityLink $link) : void{
+	public static function putEntityLink(ByteBufferWriter $out, int $protocolId, EntityLink $link) : void{
 		self::putActorUniqueId($out, $link->fromActorUniqueId);
 		self::putActorUniqueId($out, $link->toActorUniqueId);
 		Byte::writeUnsigned($out, $link->type);
 		self::putBool($out, $link->immediate);
 		self::putBool($out, $link->causedByRider);
-		LE::writeFloat($out, $link->vehicleAngularVelocity);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+			LE::writeFloat($out, $link->vehicleAngularVelocity);
+		}
 	}
 
 	/** @throws DataDecodeException */
@@ -679,11 +684,13 @@ final class CommonTypes{
 	}
 
 	/** @throws DataDecodeException */
-	public static function getStructureEditorData(ByteBufferReader $in) : StructureEditorData{
+	public static function getStructureEditorData(ByteBufferReader $in, int $protocolId) : StructureEditorData{
 		$result = new StructureEditorData();
 
 		$result->structureName = self::getString($in);
-		$result->filteredStructureName = self::getString($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_60){
+			$result->filteredStructureName = self::getString($in);
+		}
 		$result->structureDataField = self::getString($in);
 
 		$result->includePlayers = self::getBool($in);
@@ -696,9 +703,11 @@ final class CommonTypes{
 		return $result;
 	}
 
-	public static function putStructureEditorData(ByteBufferWriter $out, StructureEditorData $structureEditorData) : void{
+	public static function putStructureEditorData(ByteBufferWriter $out, int $protocolId, StructureEditorData $structureEditorData) : void{
 		self::putString($out, $structureEditorData->structureName);
-		self::putString($out, $structureEditorData->filteredStructureName);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_60){
+			self::putString($out, $structureEditorData->filteredStructureName);
+		}
 		self::putString($out, $structureEditorData->structureDataField);
 
 		self::putBool($out, $structureEditorData->includePlayers);

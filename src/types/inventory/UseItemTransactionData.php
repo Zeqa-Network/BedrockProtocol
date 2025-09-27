@@ -109,7 +109,6 @@ class UseItemTransactionData extends TransactionData{
 		CommonTypes::putVector3($out, $this->playerPosition);
 		CommonTypes::putVector3($out, $this->clickPosition);
 		VarInt::writeUnsignedInt($out, $this->blockRuntimeId);
-		VarInt::writeUnsignedInt($out, $this->clientInteractPrediction->value);
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
 			VarInt::writeUnsignedInt($out, $this->clientInteractPrediction->value);
 		}

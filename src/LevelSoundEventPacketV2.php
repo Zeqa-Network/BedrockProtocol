@@ -53,7 +53,6 @@ class LevelSoundEventPacketV2 extends DataPacket{
 		$this->position = CommonTypes::getVector3($in);
 		$this->extraData = VarInt::readSignedInt($in);
 		$this->entityType = CommonTypes::getString($in);
-		CommonTypes::getString($in);
 		$this->isBabyMob = CommonTypes::getBool($in);
 		$this->disableRelativeVolume = CommonTypes::getBool($in);
 	}

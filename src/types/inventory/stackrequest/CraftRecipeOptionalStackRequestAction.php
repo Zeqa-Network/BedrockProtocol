@@ -41,7 +41,7 @@ final class CraftRecipeOptionalStackRequestAction extends ItemStackRequestAction
 
 	public function getFilterStringIndex() : int{ return $this->filterStringIndex; }
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$recipeId = CommonTypes::readRecipeNetId($in);
 		$filterStringIndex = LE::readSignedInt($in);
 		return new self($recipeId, $filterStringIndex);

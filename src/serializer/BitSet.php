@@ -21,6 +21,7 @@ use function array_slice;
 use function array_values;
 use function count;
 use function intdiv;
+use const PHP_INT_SIZE;
 
 class BitSet{
 	private const INT_BITS = PHP_INT_SIZE * 8;

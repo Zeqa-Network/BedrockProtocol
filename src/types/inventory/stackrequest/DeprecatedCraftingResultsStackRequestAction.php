@@ -45,7 +45,7 @@ final class DeprecatedCraftingResultsStackRequestAction extends ItemStackRequest
 
 	public function getIterations() : int{ return $this->iterations; }
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$results = [];
 		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
 			$results[] = CommonTypes::getItemStackWithoutStackId($in);

@@ -108,8 +108,6 @@ class PlayerListPacket extends DataPacket implements ClientboundPacket{
 				CommonTypes::putSkin($out, $entry->skinData);
 				CommonTypes::putBool($out, $entry->isTeacher);
 				CommonTypes::putBool($out, $entry->isHost);
-				CommonTypes::putBool($out, $entry->isSubClient);
-				LE::writeUnsignedInt($out, ($entry->color ?? new Color(255, 255, 255))->toARGB());
 				if($protocolId >= ProtocolInfo::PROTOCOL_1_20_60){
 					CommonTypes::putBool($out, $entry->isSubClient);
 					if($protocolId >= ProtocolInfo::PROTOCOL_1_21_80){

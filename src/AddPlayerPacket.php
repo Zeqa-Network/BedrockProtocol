@@ -122,7 +122,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 
 		$linkCount = VarInt::readUnsignedInt($in);
 		for($i = 0; $i < $linkCount; ++$i){
-			$this->links[$i] = CommonTypes::getEntityLink($in);
+			$this->links[$i] = CommonTypes::getEntityLink($in, $protocolId);
 		}
 
 		$this->deviceId = CommonTypes::getString($in);
@@ -148,7 +148,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
 
 		VarInt::writeUnsignedInt($out, count($this->links));
 		foreach($this->links as $link){
-			CommonTypes::putEntityLink($out, $link);
+			CommonTypes::putEntityLink($out, $protocolId, $link);
 		}
 
 		CommonTypes::putString($out, $this->deviceId);

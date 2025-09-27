@@ -37,7 +37,7 @@ final class MineBlockStackRequestAction extends ItemStackRequestAction{
 
 	public function getStackId() : int{ return $this->stackId; }
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		$hotbarSlot = VarInt::readSignedInt($in);
 		$predictedDurability = VarInt::readSignedInt($in);
 		$stackId = CommonTypes::readItemStackNetIdVariant($in);

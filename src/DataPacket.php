@@ -76,7 +76,7 @@ abstract class DataPacket implements Packet{
 	/**
 	 * Decodes the packet body, without the packet ID or other generic header fields.
 	 *
-	 * @param int $protocolId *
+	 * @param int $protocolId
 	 *
 	 * @throws PacketDecodeException
 	 * @throws DataDecodeException

@@ -82,7 +82,9 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		$this->delta = CommonTypes::getVector3($in);
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_80 && ($this->predictionType === self::PREDICTION_TYPE_VEHICLE || $protocolId >= ProtocolInfo::PROTOCOL_1_21_100)){
 			$this->vehicleRotation = new Vector2(LE::readFloat($in), LE::readFloat($in));
-			$this->vehicleAngularVelocity = CommonTypes::readOptional($in, LE::readFloat(...));
+			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+				$this->vehicleAngularVelocity = CommonTypes::readOptional($in, LE::readFloat(...));
+			}
 		}
 		$this->onGround = CommonTypes::getBool($in);
 		$this->tick = VarInt::readUnsignedLong($in);
@@ -100,7 +102,10 @@ class CorrectPlayerMovePredictionPacket extends DataPacket implements Clientboun
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_80 && ($this->predictionType === self::PREDICTION_TYPE_VEHICLE || $protocolId >= ProtocolInfo::PROTOCOL_1_21_100)){
 			LE::writeFloat($out, $this->vehicleRotation->getX());
 			LE::writeFloat($out, $this->vehicleRotation->getY());
-			CommonTypes::writeOptional($out, $this->vehicleAngularVelocity, LE::writeFloat(...));
+
+			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+				CommonTypes::writeOptional($out, $this->vehicleAngularVelocity, LE::writeFloat(...));
+			}
 		}
 		CommonTypes::putBool($out, $this->onGround);
 		VarInt::writeUnsignedLong($out, $this->tick);

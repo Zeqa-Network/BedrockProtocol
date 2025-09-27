@@ -34,11 +34,11 @@ class SetActorLinkPacket extends DataPacket implements ClientboundPacket, Server
 	}
 
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
-		$this->link = CommonTypes::getEntityLink($in);
+		$this->link = CommonTypes::getEntityLink($in, $protocolId);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
-		CommonTypes::putEntityLink($out, $this->link);
+		CommonTypes::putEntityLink($out, $protocolId, $this->link);
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

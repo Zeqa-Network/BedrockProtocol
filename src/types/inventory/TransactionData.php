@@ -47,8 +47,6 @@ abstract class TransactionData{
 	}
 
 	/**
-	 * @param int $protocolId *
-	 *
 	 * @throws DataDecodeException
 	 * @throws PacketDecodeException
 	 */

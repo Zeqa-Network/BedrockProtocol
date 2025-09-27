@@ -42,14 +42,14 @@ class StructureBlockUpdatePacket extends DataPacket implements ServerboundPacket
 
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->blockPosition = CommonTypes::getBlockPosition($in);
-		$this->structureEditorData = CommonTypes::getStructureEditorData($in);
+		$this->structureEditorData = CommonTypes::getStructureEditorData($in, $protocolId);
 		$this->isPowered = CommonTypes::getBool($in);
 		$this->waterlogged = CommonTypes::getBool($in);
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::putBlockPosition($out, $this->blockPosition);
-		CommonTypes::putStructureEditorData($out, $this->structureEditorData);
+		CommonTypes::putStructureEditorData($out, $protocolId, $this->structureEditorData);
 		CommonTypes::putBool($out, $this->isPowered);
 		CommonTypes::putBool($out, $this->waterlogged);
 	}

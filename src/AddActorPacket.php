@@ -114,7 +114,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 
 		$linkCount = VarInt::readUnsignedInt($in);
 		for($i = 0; $i < $linkCount; ++$i){
-			$this->links[] = CommonTypes::getEntityLink($in);
+			$this->links[] = CommonTypes::getEntityLink($in, $protocolId);
 		}
 	}
 
@@ -142,7 +142,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
 
 		VarInt::writeUnsignedInt($out, count($this->links));
 		foreach($this->links as $link){
-			CommonTypes::putEntityLink($out, $link);
+			CommonTypes::putEntityLink($out, $protocolId, $link);
 		}
 	}
 

@@ -36,7 +36,7 @@ final class FullContainerName{
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_30){
 			$dynamicId = CommonTypes::readOptional($in, LE::readUnsignedInt(...));
 		}elseif($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
-			$dynamicId = LE::readSignedInt($in);
+			$dynamicId = LE::readUnsignedInt($in);
 		}
 		return new self($containerId, $dynamicId ?? null);
 	}
@@ -46,7 +46,7 @@ final class FullContainerName{
 		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_30){
 			CommonTypes::writeOptional($out, $this->dynamicId, LE::writeUnsignedInt(...));
 		}elseif($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
-			LE::writeSignedInt($out, $this->dynamicId ?? 0);
+			LE::writeUnsignedInt($out, $this->dynamicId ?? 0);
 		}
 	}
 }

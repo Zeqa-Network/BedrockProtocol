@@ -24,26 +24,36 @@ class ShowStoreOfferPacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::SHOW_STORE_OFFER_PACKET;
 
 	public string $offerId;
+	public bool $showAll;
 	public ShowStoreOfferRedirectType $redirectType;
 
 	/**
 	 * @generate-create-func
 	 */
-	public static function create(string $offerId, ShowStoreOfferRedirectType $redirectType) : self{
+	public static function create(string $offerId, bool $showAll, ShowStoreOfferRedirectType $redirectType) : self{
 		$result = new self;
 		$result->offerId = $offerId;
+		$result->showAll = $showAll;
 		$result->redirectType = $redirectType;
 		return $result;
 	}
 
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->offerId = CommonTypes::getString($in);
-		$this->redirectType = ShowStoreOfferRedirectType::fromPacket(Byte::readUnsigned($in));
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_50){
+			$this->redirectType = ShowStoreOfferRedirectType::fromPacket(Byte::readUnsigned($in));
+		}else{
+			$this->showAll = CommonTypes::getBool($in);
+		}
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::putString($out, $this->offerId);
-		Byte::writeUnsigned($out, $this->redirectType->value);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_20_50){
+			Byte::writeUnsigned($out, $this->redirectType->value);
+		}else{
+			CommonTypes::putBool($out, $this->showAll);
+		}
 	}
 
 	public function handle(PacketHandlerInterface $handler) : bool{

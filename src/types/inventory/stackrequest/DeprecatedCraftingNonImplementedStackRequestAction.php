@@ -27,7 +27,7 @@ final class DeprecatedCraftingNonImplementedStackRequestAction extends ItemStack
 
 	public const ID = ItemStackRequestActionType::CRAFTING_NON_IMPLEMENTED_DEPRECATED_ASK_TY_LAING;
 
-	public static function read(ByteBufferReader $in) : self{
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
 		return new self;
 	}
 

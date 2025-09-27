@@ -84,7 +84,7 @@ final class AbilitiesLayer{
 		$setAbilities = LE::readUnsignedInt($in);
 		$setAbilityValues = LE::readUnsignedInt($in);
 		$flySpeed = LE::readFloat($in);
-		$verticalFlySpeed = LE::readFloat($in);
+		$verticalFlySpeed = $protocolId >= ProtocolInfo::PROTOCOL_1_21_60 ? LE::readFloat($in) : 0.0;
 		$walkSpeed = LE::readFloat($in);
 
 		$boolAbilities = [];
