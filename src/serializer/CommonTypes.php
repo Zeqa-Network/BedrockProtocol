@@ -542,11 +542,11 @@ final class CommonTypes{
 	}
 
 	/** @throws DataDecodeException */
-	private static function readGameRule(ByteBufferReader $in, int $type, bool $isPlayerModifiable, bool $isStartGame) : GameRule{
+	private static function readGameRule(ByteBufferReader $in, int $protocolId, int $type, bool $isPlayerModifiable, bool $isStartGame) : GameRule{
 		return match($type){
-			BoolGameRule::ID => BoolGameRule::decode($in, $isPlayerModifiable),
-			IntGameRule::ID => IntGameRule::decode($in, $isPlayerModifiable, $isStartGame),
-			FloatGameRule::ID => FloatGameRule::decode($in, $isPlayerModifiable),
+			BoolGameRule::ID => BoolGameRule::decode($in, $protocolId, $isPlayerModifiable),
+			IntGameRule::ID => IntGameRule::decode($in, $protocolId, $isPlayerModifiable, $isStartGame),
+			FloatGameRule::ID => FloatGameRule::decode($in, $protocolId, $isPlayerModifiable),
 			default => throw new PacketDecodeException("Unknown gamerule type $type"),
 		};
 	}
@@ -560,14 +560,14 @@ final class CommonTypes{
 	 * @throws PacketDecodeException
 	 * @throws DataDecodeException
 	 */
-	public static function getGameRules(ByteBufferReader $in, bool $isStartGame) : array{
+	public static function getGameRules(ByteBufferReader $in, int $protocolId, bool $isStartGame) : array{
 		$count = VarInt::readUnsignedInt($in);
 		$rules = [];
 		for($i = 0; $i < $count; ++$i){
 			$name = self::getString($in);
 			$isPlayerModifiable = self::getBool($in);
 			$type = VarInt::readUnsignedInt($in);
-			$rules[$name] = self::readGameRule($in, $type, $isPlayerModifiable, $isStartGame);
+			$rules[$name] = self::readGameRule($in, $protocolId, $type, $isPlayerModifiable, $isStartGame);
 		}
 
 		return $rules;
@@ -579,13 +579,13 @@ final class CommonTypes{
 	 * @param GameRule[] $rules
 	 * @phpstan-param array<string, GameRule> $rules
 	 */
-	public static function putGameRules(ByteBufferWriter $out, array $rules, bool $isStartGame) : void{
+	public static function putGameRules(ByteBufferWriter $out, int $protocolId, array $rules, bool $isStartGame) : void{
 		VarInt::writeUnsignedInt($out, count($rules));
 		foreach($rules as $name => $rule){
 			self::putString($out, $name);
 			self::putBool($out, $rule->isPlayerModifiable());
 			VarInt::writeUnsignedInt($out, $rule->getTypeId());
-			$rule->encode($out, $isStartGame);
+			$rule->encode($out, $protocolId, $isStartGame);
 		}
 	}
 

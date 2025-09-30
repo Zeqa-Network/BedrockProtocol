@@ -16,6 +16,7 @@ namespace pocketmine\network\mcpe\protocol\types\biome\chunkgen;
 
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
 
 final class BiomeDefinitionChunkGenData{
@@ -65,13 +66,15 @@ final class BiomeDefinitionChunkGenData{
 
 	public function getLegacyWorldGenRules() : ?BiomeLegacyWorldGenRulesData{ return $this->legacyWorldGenRules; }
 
-	public static function read(ByteBufferReader $in) : self{
-		$climate = CommonTypes::readOptional($in, fn() => BiomeClimateData::read($in));
+	public static function read(ByteBufferReader $in, int $protocolId) : self{
+		$climate = CommonTypes::readOptional($in, fn() => BiomeClimateData::read($in, $protocolId));
 		$consolidatedFeatures = CommonTypes::readOptional($in, fn() => BiomeConsolidatedFeaturesData::read($in));
 		$mountainParams = CommonTypes::readOptional($in, fn() => BiomeMountainParamsData::read($in));
 		$surfaceMaterialAdjustment = CommonTypes::readOptional($in, fn() => BiomeSurfaceMaterialAdjustmentData::read($in));
 		$surfaceMaterial = CommonTypes::readOptional($in, fn() => BiomeSurfaceMaterialData::read($in));
-		$defaultOverworldSurface = CommonTypes::getBool($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_111){
+			$defaultOverworldSurface = CommonTypes::getBool($in);
+		}
 		$swampSurface = CommonTypes::getBool($in);
 		$frozenOceanSurface = CommonTypes::getBool($in);
 		$theEndSurface = CommonTypes::getBool($in);
@@ -87,7 +90,7 @@ final class BiomeDefinitionChunkGenData{
 			$mountainParams,
 			$surfaceMaterialAdjustment,
 			$surfaceMaterial,
-			$defaultOverworldSurface,
+			$defaultOverworldSurface ?? false,
 			$swampSurface,
 			$frozenOceanSurface,
 			$theEndSurface,
@@ -99,13 +102,15 @@ final class BiomeDefinitionChunkGenData{
 		);
 	}
 
-	public function write(ByteBufferWriter $out) : void{
-		CommonTypes::writeOptional($out, $this->climate, fn(ByteBufferWriter $out, BiomeClimateData $v) => $v->write($out));
+	public function write(ByteBufferWriter $out, int $protocolId) : void{
+		CommonTypes::writeOptional($out, $this->climate, fn(ByteBufferWriter $out, BiomeClimateData $v) => $v->write($out, $protocolId));
 		CommonTypes::writeOptional($out, $this->consolidatedFeatures, fn(ByteBufferWriter $out, BiomeConsolidatedFeaturesData $v) => $v->write($out));
 		CommonTypes::writeOptional($out, $this->mountainParams, fn(ByteBufferWriter $out, BiomeMountainParamsData $v) => $v->write($out));
 		CommonTypes::writeOptional($out, $this->surfaceMaterialAdjustment, fn(ByteBufferWriter $out, BiomeSurfaceMaterialAdjustmentData $v) => $v->write($out));
 		CommonTypes::writeOptional($out, $this->surfaceMaterial, fn(ByteBufferWriter $out, BiomeSurfaceMaterialData $v) => $v->write($out));
-		CommonTypes::putBool($out, $this->defaultOverworldSurface);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_111){
+			CommonTypes::putBool($out, $this->defaultOverworldSurface);
+		}
 		CommonTypes::putBool($out, $this->swampSurface);
 		CommonTypes::putBool($out, $this->frozenOceanSurface);
 		CommonTypes::putBool($out, $this->theEndSurface);

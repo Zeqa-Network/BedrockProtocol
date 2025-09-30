@@ -56,10 +56,10 @@ class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 	}
 
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
-		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_110_OLD){
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_111){
 			$length = VarInt::readUnsignedInt($in);
 			for($i = 0; $i < $length; ++$i){
-				$this->armorSlotAndDamagePairs[$i] = ArmorSlotAndDamagePair::read($in);
+				$this->armorSlotAndDamagePairs[] = ArmorSlotAndDamagePair::read($in);
 			}
 		}else{
 			$flags = Byte::readUnsigned($in);
@@ -109,7 +109,7 @@ class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 	}
 
 	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
-		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_110_OLD){
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_111){
 			VarInt::writeUnsignedInt($out, count($this->armorSlotAndDamagePairs));
 			foreach($this->armorSlotAndDamagePairs as $pair){
 				$pair->write($out);

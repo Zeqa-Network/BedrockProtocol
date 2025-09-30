@@ -34,11 +34,11 @@ final class BoolGameRule extends GameRule{
 		return $this->value;
 	}
 
-	public function encode(ByteBufferWriter $out, bool $isStartGame) : void{
+	public function encode(ByteBufferWriter $out, int $protocolId, bool $isStartGame) : void{
 		CommonTypes::putBool($out, $this->value);
 	}
 
-	public static function decode(ByteBufferReader $in, bool $isPlayerModifiable) : self{
+	public static function decode(ByteBufferReader $in, int $protocolId, bool $isPlayerModifiable) : self{
 		return new self(CommonTypes::getBool($in), $isPlayerModifiable);
 	}
 }

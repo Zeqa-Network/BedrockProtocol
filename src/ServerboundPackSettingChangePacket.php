@@ -45,7 +45,7 @@ class ServerboundPackSettingChangePacket extends DataPacket implements Serverbou
 
 	public function getPackSetting() : PackSetting{ return $this->packSetting; }
 
-	protected function decodePayload(ByteBufferReader $in) : void{
+	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
 		$this->packId = CommonTypes::getUUID($in);
 
 		$name = CommonTypes::getString($in);
@@ -57,7 +57,7 @@ class ServerboundPackSettingChangePacket extends DataPacket implements Serverbou
 		};
 	}
 
-	protected function encodePayload(ByteBufferWriter $out) : void{
+	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
 		CommonTypes::putUUID($out, $this->packId);
 		CommonTypes::putString($out, $this->packSetting->getName());
 		VarInt::writeUnsignedInt($out, $this->packSetting->getTypeId()->value);
