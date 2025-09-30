@@ -18,6 +18,9 @@ use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
+use pocketmine\network\mcpe\protocol\types\ArmorSlot;
+use pocketmine\network\mcpe\protocol\types\ArmorSlotAndDamagePair;
+use function count;
 
 class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 	public const NETWORK_ID = ProtocolInfo::PLAYER_ARMOR_DAMAGE_PACKET;
@@ -28,34 +31,22 @@ class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 	private const FLAG_FEET = 3;
 	private const FLAG_BODY = 4;
 
-	private ?int $headSlotDamage;
-	private ?int $chestSlotDamage;
-	private ?int $legsSlotDamage;
-	private ?int $feetSlotDamage;
-	private ?int $bodySlotDamage;
+	/**
+	 * @var ArmorSlotAndDamagePair[]
+	 * @phpstan-var list<ArmorSlotAndDamagePair>
+	 */
+	private array $armorSlotAndDamagePairs = [];
 
 	/**
 	 * @generate-create-func
+	 * @param ArmorSlotAndDamagePair[] $armorSlotAndDamagePairs
+	 * @phpstan-param list<ArmorSlotAndDamagePair> $armorSlotAndDamagePairs
 	 */
-	public static function create(?int $headSlotDamage, ?int $chestSlotDamage, ?int $legsSlotDamage, ?int $feetSlotDamage, ?int $bodySlotDamage) : self{
+	public static function create(array $armorSlotAndDamagePairs) : self{
 		$result = new self;
-		$result->headSlotDamage = $headSlotDamage;
-		$result->chestSlotDamage = $chestSlotDamage;
-		$result->legsSlotDamage = $legsSlotDamage;
-		$result->feetSlotDamage = $feetSlotDamage;
-		$result->bodySlotDamage = $bodySlotDamage;
+		$result->armorSlotAndDamagePairs = $armorSlotAndDamagePairs;
 		return $result;
 	}
-
-	public function getHeadSlotDamage() : ?int{ return $this->headSlotDamage; }
-
-	public function getChestSlotDamage() : ?int{ return $this->chestSlotDamage; }
-
-	public function getLegsSlotDamage() : ?int{ return $this->legsSlotDamage; }
-
-	public function getFeetSlotDamage() : ?int{ return $this->feetSlotDamage; }
-
-	public function getBodySlotDamage() : ?int{ return $this->bodySlotDamage; }
 
 	private function maybeReadDamage(int $flags, int $flag, ByteBufferReader $in) : ?int{
 		if(($flags & (1 << $flag)) !== 0){
@@ -65,14 +56,35 @@ class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 	}
 
 	protected function decodePayload(ByteBufferReader $in, int $protocolId) : void{
-		$flags = Byte::readUnsigned($in);
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_110_OLD){
+			$length = VarInt::readUnsignedInt($in);
+			for($i = 0; $i < $length; ++$i){
+				$this->armorSlotAndDamagePairs[$i] = ArmorSlotAndDamagePair::read($in);
+			}
+		}else{
+			$flags = Byte::readUnsigned($in);
 
-		$this->headSlotDamage = $this->maybeReadDamage($flags, self::FLAG_HEAD, $in);
-		$this->chestSlotDamage = $this->maybeReadDamage($flags, self::FLAG_CHEST, $in);
-		$this->legsSlotDamage = $this->maybeReadDamage($flags, self::FLAG_LEGS, $in);
-		$this->feetSlotDamage = $this->maybeReadDamage($flags, self::FLAG_FEET, $in);
-		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
-			$this->bodySlotDamage = $this->maybeReadDamage($flags, self::FLAG_BODY, $in);
+			if(($headSlotDamage = $this->maybeReadDamage($flags, self::FLAG_HEAD, $in)) !== null){
+				$this->armorSlotAndDamagePairs[] = new ArmorSlotAndDamagePair(ArmorSlot::HEAD, $headSlotDamage);
+			}
+
+			if(($chestSlotDamage = $this->maybeReadDamage($flags, self::FLAG_CHEST, $in)) !== null){
+				$this->armorSlotAndDamagePairs[] = new ArmorSlotAndDamagePair(ArmorSlot::TORSO, $chestSlotDamage);
+			}
+
+			if(($legsSlotDamage = $this->maybeReadDamage($flags, self::FLAG_LEGS, $in)) !== null){
+				$this->armorSlotAndDamagePairs[] = new ArmorSlotAndDamagePair(ArmorSlot::LEGS, $legsSlotDamage);
+			}
+
+			if(($feetSlotDamage = $this->maybeReadDamage($flags, self::FLAG_FEET, $in)) !== null){
+				$this->armorSlotAndDamagePairs[] = new ArmorSlotAndDamagePair(ArmorSlot::FEET, $feetSlotDamage);
+			}
+
+			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+				if(($bodySlotDamage = $this->maybeReadDamage($flags, self::FLAG_BODY, $in)) !== null){
+					$this->armorSlotAndDamagePairs[] = new ArmorSlotAndDamagePair(ArmorSlot::BODY, $bodySlotDamage);
+				}
+			}
 		}
 	}
 
@@ -86,21 +98,45 @@ class PlayerArmorDamagePacket extends DataPacket implements ClientboundPacket{
 		}
 	}
 
-	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
-		Byte::writeUnsigned($out,
-			$this->composeFlag($this->headSlotDamage, self::FLAG_HEAD) |
-			$this->composeFlag($this->chestSlotDamage, self::FLAG_CHEST) |
-			$this->composeFlag($this->legsSlotDamage, self::FLAG_LEGS) |
-			$this->composeFlag($this->feetSlotDamage, self::FLAG_FEET) |
-			($protocolId >= ProtocolInfo::PROTOCOL_1_21_20 ? $this->composeFlag($this->bodySlotDamage, self::FLAG_BODY) : 0)
-		);
+	private function getDamageBySlot(ArmorSlot $slot) : ?int{
+		foreach($this->armorSlotAndDamagePairs as $pair){
+			if($pair->getSlot() === $slot){
+				return $pair->getDamage();
+			}
+		}
 
-		$this->maybeWriteDamage($this->headSlotDamage, $out);
-		$this->maybeWriteDamage($this->chestSlotDamage, $out);
-		$this->maybeWriteDamage($this->legsSlotDamage, $out);
-		$this->maybeWriteDamage($this->feetSlotDamage, $out);
-		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
-			$this->maybeWriteDamage($this->bodySlotDamage, $out);
+		return null;
+	}
+
+	protected function encodePayload(ByteBufferWriter $out, int $protocolId) : void{
+		if($protocolId >= ProtocolInfo::PROTOCOL_1_21_110_OLD){
+			VarInt::writeUnsignedInt($out, count($this->armorSlotAndDamagePairs));
+			foreach($this->armorSlotAndDamagePairs as $pair){
+				$pair->write($out);
+			}
+		}else{
+			$headSlotDamage = $this->getDamageBySlot(ArmorSlot::HEAD);
+			$chestSlotDamage = $this->getDamageBySlot(ArmorSlot::TORSO);
+			$legsSlotDamage = $this->getDamageBySlot(ArmorSlot::LEGS);
+			$feetSlotDamage = $this->getDamageBySlot(ArmorSlot::FEET);
+			$bodySlotDamage = $this->getDamageBySlot(ArmorSlot::BODY);
+
+			Byte::writeUnsigned(
+				$out,
+				$this->composeFlag($headSlotDamage, self::FLAG_HEAD) |
+				$this->composeFlag($chestSlotDamage, self::FLAG_CHEST) |
+				$this->composeFlag($legsSlotDamage, self::FLAG_LEGS) |
+				$this->composeFlag($feetSlotDamage, self::FLAG_FEET) |
+				($protocolId >= ProtocolInfo::PROTOCOL_1_21_20 ? $this->composeFlag($bodySlotDamage, self::FLAG_BODY) : 0)
+			);
+
+			$this->maybeWriteDamage($headSlotDamage, $out);
+			$this->maybeWriteDamage($chestSlotDamage, $out);
+			$this->maybeWriteDamage($legsSlotDamage, $out);
+			$this->maybeWriteDamage($feetSlotDamage, $out);
+			if($protocolId >= ProtocolInfo::PROTOCOL_1_21_20){
+				$this->maybeWriteDamage($bodySlotDamage, $out);
+			}
 		}
 	}
 

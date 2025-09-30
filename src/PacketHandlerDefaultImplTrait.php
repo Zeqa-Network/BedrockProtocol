@@ -881,4 +881,8 @@ trait PacketHandlerDefaultImplTrait{
 	public function handleServerScriptDebugDrawer(ServerScriptDebugDrawerPacket $packet) : bool{
 		return false;
 	}
+
+	public function handleServerboundPackSettingChange(ServerboundPackSettingChangePacket $packet) : bool{
+		return false;
+	}
 }
