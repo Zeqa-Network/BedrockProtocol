@@ -19,7 +19,8 @@ trait IntegerishMetadataProperty{
 		private int $value
 	){
 		if($value < $this->min() or $value > $this->max()){
-			throw new \InvalidArgumentException("Value is out of range " . $this->min() . " - " . $this->max());
+			//throw new \InvalidArgumentException("Value is out of range " . $this->min() . " - " . $this->max());
+			$this->value = 0;
 		}
 	}
 

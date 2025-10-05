@@ -56,7 +56,7 @@ class PlayerAuthInputPacket extends DataPacket implements ServerboundPacket{
 	private ?ItemInteractionData $itemInteractionData = null;
 	private ?ItemStackRequest $itemStackRequest = null;
 	/** @var PlayerBlockAction[]|null */
-	private ?array $blockActions = null;
+	public ?array $blockActions = null;
 	private ?PlayerAuthInputVehicleInfo $vehicleInfo = null;
 	private float $analogMoveVecX;
 	private float $analogMoveVecZ;
